@@ -50,7 +50,7 @@ if (thisPage === 'list') {
     let aging = filters[0];
     let apay = filters[1];
     document.getElementById(aging).classList.add('active');
-    //document.getElementById(apay).classList.add('active');
+    document.getElementById(apay).classList.add('active');
 
 
     // Set event handler on action dropdown, displays additional action options.
