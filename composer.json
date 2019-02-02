@@ -1,0 +1,26 @@
+{
+    "name": "fishpond",
+    "type": "Contact Management",
+    "description": "Tracking collection calls.",
+    "keywords": ["contact management", "AIMsi"],
+    "homepage": "https://github.com/thischrisblack/fishpond",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chris Black",
+            "role": "Cloned Panique's 'mini' and turned it into this."
+        },
+        {
+            "name": "Panique",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/thischrisblack/fishpond/issues",
+        "source": "https://github.com/thischrisblack/fishpond"
+    },
+    "require": {
+        "php": ">=5.3.0",
+        "phpmailer/phpmailer": "~6.0"
+    }
+}
