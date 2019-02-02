@@ -1,0 +1,52 @@
+/**
+* How it works
+*/
+    public/index.php
+    ↓
+    application/config/config.php               
+        - Defines constants, like MySQL login info
+        - This is where PEAR mail credentials might go.
+        - Also defines URL constant
+
+    also ↓
+    core/application.php
+        - This splits the URL like this:
+            ↓URL              /↓ controller/home.php  /↓ deleteSticky() in home.php  /↓ passes (23) to deleteSticky
+            www.fishpond.com  /home                   /deletesticky                  /23
+
+    also ↓
+    core/controller.php
+        - Creates new database connection object and passes it into model/model.php
+
+
+/**
+* To Do
+*/
+
+Maybe rename all the $storeData variables to something without the word store in it?
+
+Find all the commented-out lines for testing and list them below.
+
+/**
+* Issues
+*/
+
+
+
+/**
+* Commented-out for testing (needs to be uncommented)
+*/
+model->singleMailer()
+
+
+
+/**
+* Would be nice
+*/
+
+HEY I think I can make the action-options dropdowns automatically fill in by reading the data.json file. For example, the email dropdown could look for all "email-*" keys in the JSON file, and build them from there.
+
+HEY I think i can do the same thing with the options in the main action dropdown. Add them and their values to the JSON.
+
+
+

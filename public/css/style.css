@@ -1,0 +1,346 @@
+/*------------------------------
+
+General Styles
+
+-------------------------------*/
+
+/* Fonts
+font-family: 'IBM Plex Mono', monospace;
+font-family: 'Roboto Mono', monospace;
+font-family: 'Source Sans Pro', sans-serif;
+*/
+
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+h1 {
+    font-size: 3.5rem;
+}
+
+textarea {
+    margin: 20px 0 20px 0;
+}
+
+/* Column header (also heads history column) */
+.col-header {
+    font-weight: bold;
+    font-size: 120%;
+    padding: 10px 0px 8px 3px;
+    /* border-bottom: 1px solid #999; */
+}
+
+/*------------------------------
+
+Navigation
+
+-------------------------------*/
+
+.navbar {
+    margin-bottom: .5em;
+    font-size: 90%;
+}
+
+.navbar a {
+    color: white;
+    margin 0px;
+}
+
+.navbar a:hover {
+    color: red;
+}
+
+.nav-stock-link {
+    padding: 0px 5px 10px 0px;
+}
+
+.nav-item {
+    border-radius: 20px;
+    text-align: center;
+    line-height: 1.1em;
+}
+
+.nav-item .active {
+    background: #777;
+    color: white;
+    border-radius: 15px;
+}
+
+.nav-item .aging-total {
+    font-size: 85%; 
+    color: #ddd;
+}
+
+
+/*-------------------------------------------------------
+
+The Main Page
+
+--------------------------------------------------------*/
+
+/* The list column itself */
+.left-column { 
+    font-family: 'Roboto Mono', monospace;
+}
+
+
+/*------------------------------
+
+Left column: Account List Area
+
+-------------------------------*/
+
+/* The <ul> holding the account list */
+.account-list {
+    list-style-type: none;
+    padding-left: 0;
+    font-size: 70%;
+    color: #aaa;
+}
+/* The <li> items in the account list */
+.account-list-item {
+    margin-top: 3px;
+    border-bottom: 1px solid #f3f3f3;
+}
+
+.account-list-item:hover {
+    background: #eee;
+}
+.account-list-item a {
+    color: black;
+
+}
+/* The 'days late' <span> in each list item */
+.account-list-days-late {
+    display: inline;
+    margin: 0 10px 0 10px;
+}
+.account-list-bal-due {
+    float: right;
+}
+
+
+/*------------------------------
+
+Middle column: Account Area
+
+-------------------------------*/
+
+#stock-pond-warning {
+    display: none;
+}
+
+/* The account column itself */
+.middle-column {
+    /* border-right: 1px solid #ddd;
+    border-left: 1px solid #ddd; */
+    /* padding: 20px; */
+}
+/* Top row, the acount info display */
+.account-info {
+    font-size: 110%;
+}
+/* Left column, the contact details */
+.account-left h3 {
+
+}
+
+/* Sticky notes! */
+.sticky-notes-area {
+}
+.sticky-note {
+    font-size: 100%;
+    padding: 1em;
+    margin: 20px 0px 20px 0px;
+    background: #fffdc9;
+}
+.sticky-delete {
+    float: right;
+    margin-top: -1em;
+    margin-right: -0.4em;
+    font-weight: bold;
+    clear: left;
+    font-size: 120%;
+}
+.sticky-note-info {
+    font-size: 80%;
+    display: block;
+    text-align: right;
+}
+
+/* Account number, name, student, etc/ */
+.account-detail {
+
+}
+
+/* Right column, the payment details */
+.account-right {
+text-align: right;    
+}
+
+/* Autopay indicator */
+.autopay-alert {
+    color: red;
+    font-weight: bold;
+}
+
+
+/*------------------------------
+
+Middle column: Contact Area
+
+-------------------------------*/
+
+/* Action row */
+.action {
+    margin-top: 20px;
+}
+
+/* Input row */
+.action-input {
+    
+}
+
+.action-options, .action-calendar {
+    display: none;
+}
+
+/* Save row */
+.action-save {
+    
+}
+
+/* Save row */
+.action-delist {
+    font-size: 80%;
+}
+
+/* The textarea */
+#ctac_note {
+    width: 100%;
+    height: 100px;
+}
+
+/* The save button area */
+.contact-save {
+    text-align: right;
+}
+
+
+
+
+/*------------------------------
+
+Right column: the history area. 
+
+-------------------------------*/
+
+ /* The history column itself */
+ .right-column {
+ }
+
+ .history-item {
+    margin-bottom: 10px;
+ }
+ .history-action {
+    font-size: 90%;
+    color: #000;
+ }
+.history-date {
+    float: right;
+}
+.history-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 75%;
+    color: #999;
+}
+
+
+/*-------------------------------------------------------
+
+The Pond Stocker Page
+
+--------------------------------------------------------*/
+
+.pond-stock {
+    font-size: 120%;
+    padding-bottom: 200px;
+}
+
+.pond-stock-section {
+    margin: 30px 0 40px 0;
+    border-left: 5px solid teal;
+    padding-left: 20px;
+}
+
+.payment-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.payment-list-item {
+    border: 0px solid #ddd;
+    padding: 3px 5px;
+    margin-top: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 65%;
+    background: #edfeff;
+}
+
+.payment-delete {
+    font-size: 100%;
+    font-weight: bold;
+}
+
+#get-aimsi-instructions {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 90%;
+}
+
+#aimsi-instructions {
+    display: none;
+}
+
+#aimsi-instructions li {
+    margin-top: 20px;
+}
+
+/* The fishes pastebox */
+#fishes-pastebox {
+    width: 100%;
+    height: 200px;
+}
+
+.payment-delete {
+    cursor: pointer;
+    float: right;
+}
+
+#no-more-payments {
+    display: none;
+}
+
+
+
+/*-------------------------------------------------------
+
+The Mass Mailer Page
+
+--------------------------------------------------------*/
+
+/* Uses some pond-stock column classes */
+
+.mass-mailer-group {
+    margin-bottom: 30px;
+}
+
+.mass-mailer-email {    
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 70%;
+    margin-left: 30px; 
+    border-left: 2px solid #aaa;
+    background: #fafafa;
+    padding: 20px;
+}
+
