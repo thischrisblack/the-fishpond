@@ -18,12 +18,19 @@ class Model
     }
 
 
+
+
+    /** --------------------------------------------------------------------------------------------------------
+     * GENERAL FUNCTIONS
+    ** -------------------------------------------------------------------------------------------------------*/
+
     /**
-     * Sets session variables.
+     * Sets session variables for list filters like aging categories and autopays.
+     * Also checks if user is logged in.
      */
     public function setSessionVariables()
     {
-        // Set session variables for search limits
+
         session_start();
 
         // If user not logged in, go to login page.
@@ -33,7 +40,7 @@ class Model
             $_SESSION["loggedin"] = "Y";
         }
 
-        // If no session variables set, set to defaults.
+        // If no session variables set, set defaults.
         if (!isset($_SESSION["minmax"])) {
             $_SESSION["minmax"] = "1-180";
         }
@@ -44,7 +51,7 @@ class Model
             $_SESSION["ctac_lanid"] = "";
         }
 
-        // If there is $_GET data, set the appropriate session avariable.
+        // If there is $_GET data, set the appropriate session variable.
         if ($_GET) {
             if (isset($_GET["apay"])) {
                 $_SESSION["apay"] = $_GET["apay"];
@@ -69,10 +76,16 @@ class Model
         return $variables;
     }
 
+
+
     
 
+    /** --------------------------------------------------------------------------------------------------------
+     * POND STOCKING FUNCTIONS
+    * --------------------------------------------------------------------------------------------------------*/    
+
     /**
-    * Upload accounts CSV file to database
+    * Load account data into database
     */
     public function stockPond($data)
     {
@@ -81,26 +94,22 @@ class Model
          * but here's why: We're not using LOAD DATA INFILE because if you, like
          * me, are on a shared hosting plan with cPanel, your MySQL user won't have 
          * global privileges to use that, so we have to go a line at a time.
-         * 
-         * The reason I don't use a file upload to upload and parse the exported Excel
-         * (or CSV) file, is right now I don't know how to do that. Save that
-         * for a future update. For now, it's copy paste.
          */
 
-        // Get existing data out of the table.
+        // Remove existing data from database.
         $sql = ("TRUNCATE TABLE fishes");
         $query = $this->db->prepare($sql);
         $query->execute();
 
-        // Get those apostrophes out of there.
+        // Get those apostrophes and quotes escaped.
         $data = addslashes($data);
 
         // Start parsing.
         $fish = str_getcsv($data, "\n"); 
         foreach($fish as $account) {
-            $account = str_getcsv($account, ";");            
-            foreach($account as $item) { // $item = each field
-                $item = str_getcsv($item, "\t");
+            $account = str_getcsv($account, ";");   // $account = each row         
+            foreach($account as $item) {            
+                $item = str_getcsv($item, "\t");    // $item = each field
 
                 // Skip the first row if it's headers.
                 if ($item[0] == "crnt_pk") {
@@ -128,7 +137,6 @@ class Model
      */
     public Function clearPaid()
     {
-        // Delete all the accounts that are paid off, because AIMsi still has them in the statements export for some reason.
         $sql = ("DELETE FROM fishes WHERE crnt_payoff = '0.00'");
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -139,7 +147,6 @@ class Model
      */
     public Function clearExtras()
     {
-        // Clear out both 'extra' fields
         $sql = ("UPDATE fishes SET crnt_extra2 = '', crnt_extra1 = ''");
         $query = $this->db->prepare($sql);
         $query->execute();
@@ -195,7 +202,7 @@ class Model
     public Function dueCalc($accounts)
     {
         foreach ($accounts as $account) {
-            $nowDue = $this->dueCalculator($account);
+            $nowDue = $this->dueCalculator($account); // dueCalculator() is right below
             $sql = ("UPDATE fishes SET crnt_paymentdue = '$nowDue' WHERE crnt_pk = '$account->crnt_pk'");
             $query = $this->db->prepare($sql);
             if(!$query->execute()) {
@@ -205,7 +212,7 @@ class Model
     }
 
     /**
-     * Payment Calculator
+     * Payment due calculator
     */
     public function dueCalculator($account) {
     
@@ -213,52 +220,30 @@ class Model
          * This whole situation is frustrating. AIMsi won't give a simple
          * amount due in any data export, and certainly not in the statements
          * export we use for this, so we have to calculate it here. It's not
-         * 100% fool-proof, but it works most of the time.
-         */
+         * 100% fool-proof, but it works 99.9% of the time.
+        **/
 
-        // SET SOME DATE VARIABLES
-        // Not needed?
-        // $today = strtotime('00:00:00');
-        // $dateToday = DATE('j', time());
-        // $dateDue = DATE('j', strtotime($account->crnt_ndate));
+        // This is the easy one. If the existing payment due = the crnt_payoff, then that's the answer.
+        if($account->crnt_amtdue == $account->crnt_payoff) {
+            $totalAmtDue = $account->crnt_payoff;
+            return $totalAmtDue;
+        }
 
-        // SET THE LATE FEE
+        // Set the late fee your store charges.
         $lateFee = 10;
 
-        // TRY TO GET THE AMOUNT OF A SINGLE PAYMENT.
-        // $numPays = explode(' ', $account->crnt_payments, 2);
-        // $num = $numPays[0];
-        // // HAS TO BE AT LEAST ONE PAYMENT DUE
-        // if($num == 0) { $num = 1; }
-        // // GET THE AMOUNT OF A SINGLE PAYMENT. SUCH A HASSLE
-        // $onePayment = $account->crnt_paymentdue / $num;  
-
-        // IF THE DUE DATE (AS IN DAY OF THE MONTH) IS GREATER THAN TODAY
-        // NOTE: This may not be needed anymore because I have since added the 
-        // clearCurrent() method above.
-        // if ($dateDue > $dateToday) {
-        //     // THEN AIMSI HAS OVERSHOT THE TRUE PAYMENT DUE BY ONE PAYMENT
-        //     // SO WE NEED TO SUBTRACT THAT
-        //     $amountDue = $account->crnt_paymentdue - $onePayment;
-        // } else {
-        //     // OTHERWISE THE AMT DUE IS THE PAYMENT DUE
-        //     $amountDue = $account->crnt_paymentdue;
-        // }
         $amountDue = $account->crnt_paymentdue;
-
-        // SO FAR SO GOOD. LET'S GET THE DAYS LATE
         $daysLate = $account->crnt_extra1;
 
-        // DETERMINE HOW MANY LATE FEES DUE
+        // How many late fees are due?
         $numberLateFees = 0;
         if ($daysLate > 10) {
             $numberLateFees = floor(($daysLate - 10) / 30) + 1;
         }
 
-        // GET LATE FEE
         $totalLateFee = $numberLateFees * $lateFee;
 
-        // THIS WHOLE CONVOLUTED THING TRIES TO ACCOUNT FOR THE "ASSESSED" FEES
+        // AIMsi has "assesed" late fees in the export. Here we deal with that.
         if (($account->crnt_latedue - $lateFee) > 0) {
             if ($daysLate > 0 AND $daysLate < 11) {
                 $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
@@ -273,23 +258,56 @@ class Model
 
         $totalAmtDue = $amountDue + $totalLateFee;
 
-        // We don't want the amount due to be greater than the remaining payoff balance on the account.
-        if($account->crnt_amtdue == $account->crnt_payoff) {
-            $totalAmtDue = $account->crnt_payoff;
-        }
-
         return $totalAmtDue;
+
+    }
+
+
+
+    /** --------------------------------------------------------------------------------------------------------
+     * FUNCTIONS FOR HANDLING ONLINE PAYMENTS (if your store does that)
+    * --------------------------------------------------------------------------------------------------------*/  
+
+    /**
+    * Get online payments
+    * These payments will be entered in your contact database by your script that handles the online payments.
+    */
+    public function getOnlinePayments()
+    {
+        $sql = "SELECT * FROM contact WHERE (ctac_action = 'Paid Online' AND ctac_seen <> 'Y') ORDER BY ctac_date";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+
+        return $query->fetchAll();
     }
 
     /**
+     * Mark a payment as "seen", when the user deletes a payment from the list.
+     */
+    public function markPaymentSeen($ID) {
+        $sql = "UPDATE contact SET ctac_seen = 'Y' WHERE ID = $ID";
+        $query = $this->db->prepare($sql);
+        $query->execute();
+    }
+
+
+
+    /** --------------------------------------------------------------------------------------------------------
+     * FUNCTIONS TO GET ACCOUNT LISTS AND HISTORY
+    * --------------------------------------------------------------------------------------------------------*/    
+
+    /**
      * Get account list
-     * $emailFilter defults to any dumb value, like "monkey", return all rows,
-     * but if passed "" it will keep out accounts with no email address.
+     * $emailFilter defaulting to "monkey" returns all rows, because no email address is
+     * "monkey", but if passed "" it will remove accounts with no email address.
+     * Passing "" is used by the massMailer() function.
     */
     public function accountList($apay, $min, $max, $emailFilter = "monkey")
     {
-        // The ORDER BY variable is '* 1' because crnt_extra1 must be stored as VARCHAR,
-        // because its initial value is a string.
+        /**
+         * The ORDER BY variable is '* 1' because crnt_extra1 is stored as VARCHAR,
+         * because its initial value is a string. This converts it to a number.
+         */ 
         $sql = "SELECT * FROM fishes WHERE (crnt_rntdesc <> '$apay' AND 
                                             crnt_extra1 >= $min AND 
                                             crnt_extra1 <= $max AND 
@@ -303,12 +321,87 @@ class Model
         if (sizeof($result) > 0) {
             return $result;
         } else {
+            // If no results, show the "done" page.
             header('location: ' . URL . 'home/done');
         }
     }
 
     /**
-    * Get history
+     * All Aging Category Totals
+     * Returns an object with the counts of each aging category
+     * This data is used in the navbar, and in the "done" page.
+     */
+    public function allAging() {
+
+        $accounts = $this->accountList("all", 0, 180);
+
+        $one = array_filter($accounts, function($account) {
+            return ($account->crnt_extra1 > 0 && $account->crnt_extra1 <11);
+        });
+        $eleven = array_filter($accounts, function($account) {
+            return ($account->crnt_extra1 > 10 && $account->crnt_extra1 <31);
+        });
+        $thirtyOne = array_filter($accounts, function($account) {
+            return ($account->crnt_extra1 > 30 && $account->crnt_extra1 <61);
+        });
+        $sixtyOne = array_filter($accounts, function($account) {
+            return ($account->crnt_extra1 > 60 && $account->crnt_extra1 <91);
+        });
+        $ninetyOne = array_filter($accounts, function($account) {
+            return ($account->crnt_extra1 > 90 && $account->crnt_extra1 <121);
+        });
+        $oneTwentyPlus = array_filter($accounts, function($account) {
+            return $account->crnt_extra1 > 120;
+        });
+
+        $aging = new stdClass();
+
+        $aging->all = count($accounts);
+        $aging->one = count($one);
+        $aging->eleven = count($eleven);
+        $aging->thirtyOne = count($thirtyOne);
+        $aging->sixtyOne = count($sixtyOne);
+        $aging->ninetyOne = count($ninetyOne);
+        $aging->oneTwentyPlus = count($oneTwentyPlus);
+
+        return $aging;
+    }
+
+    /**
+     * If there are multiple sub accounts, this adds up the total payments due
+     * and concatenates strings of the inventory and sub-account numbers. This prevents
+     * duplicate account views.
+     */
+    public function addItUp($accountList) {
+        // Set all variables initially to nothing.
+        $totalPay = 0;
+        $totalInventory = "";
+        $totalSub = "";
+        $totalStudent = "";
+        // For first iteration, no divider.
+        $divider = "";
+        foreach ($accountList as $account) {
+            if ($accountList[0]->crnt_acct == $account->crnt_acct) {
+                $totalPay += $account->crnt_paymentdue;
+                $totalInventory .= $divider . $account->crnt_desc;
+                $totalSub .= " -" . $account->crnt_sub;
+                $totalStudent .= $divider . $account->crnt_student . ": " . $account->crnt_desc;
+            }
+            // Now we have a divider for subsequent iterations.
+            $divider = " | ";
+        }
+        // Create the object for use by home.php
+        $addedItems = (object) [
+            'payment' => $totalPay,
+            'inventory' => $totalInventory,
+            'sub' => $totalSub,
+            'student' => $totalStudent
+        ];
+        return $addedItems;
+    }
+
+    /**
+    * Get history, for the right column.
     */
     public function accountHistory($account)
     {
@@ -317,27 +410,6 @@ class Model
         $query->execute();
 
         return $query->fetchAll();
-    }
-
-    /**
-    * Get online payments
-    */
-    public function getOnlinePayments()
-    {
-        $sql = "SELECT * FROM contact WHERE (ctac_action = 'Paid Online' AND ctac_seen <> 'Y') ORDER BY ctac_date";
-        $query = $this->db->prepare($sql);
-        $query->execute();
-
-        return $query->fetchAll();
-    }
-
-    /**
-     * Mark a payment as "seen"
-     */
-    public function markPaymentSeen($ID) {
-        $sql = "UPDATE contact SET ctac_seen = 'Y' WHERE ID = $ID";
-        $query = $this->db->prepare($sql);
-        $query->execute();
     }
 
     /**
@@ -351,6 +423,63 @@ class Model
 
         return $query->fetchAll();
     }    
+
+    /**
+     * Gets the currently displayed customer data for inclusion in the
+     * customer-data tag n the footer, used by JavaScript for boilerplate
+     * text in the contact notes.
+     * 
+     * I'm not using the MySQL column header names for this, because I'm 
+     * not sure I want them visible in the HTML. 
+     */
+    public function customerData($account, $addItUp) {
+        $customerData =   '{"NAME": "' . htmlspecialchars($account->crnt_name) . 
+                        '", "DAYSLATE": "' . $account->crnt_extra1 . 
+                        '", "BALDUE": "' . number_format($addItUp->payment, 2) . 
+                        '", "DUEDATE": "' . $account->crnt_ndate . 
+                        '", "ACCT": "' . $account->crnt_acct . $addItUp->sub . 
+                        '", "BUSPHONE": "' . BUS_PHONE . 
+                        '", "BUSPAYMENT": "' . BUS_PAYMENT . 
+                        '", "INSTRUMENT": "' . $account->crnt_desc . 
+                        '", "STATEMENTDATE": "' . date('F j, Y') . 
+                        '", "BUSNAME": "' . BUS_NAME . 
+                        '"}';
+        return $customerData;
+    }
+
+    /**
+     * Account search
+    */
+    public function displayAccount($search)
+    {
+        // FORMAT A PHONE NUMBER SEARCH, WITH HYPHENS
+        if(preg_match( '/^(\d{3})\-(\d{3})\-(\d{4})$/', $search,  $matches ) ) {
+            $search = "(" . $matches[1] . ') ' .$matches[2] . '-' . $matches[3];
+        }
+        // FORMAT A PHONE NUMBER SEARCH, WITHOUT HYPHENS
+        if(preg_match( '/^(\d{3})(\d{3})(\d{4})$/', $search,  $matches ) ) {
+            $search = "(" . $matches[1] . ') ' .$matches[2] . '-' . $matches[3];
+        }
+
+        $sql = "SELECT * FROM fishes WHERE :search IN (crnt_acct,crnt_hmphone,crnt_email)";
+        $query = $this->db->prepare($sql);      
+        $parameters = array(':search' => $search);  
+        $query->execute($parameters);
+        $result = $query->fetchAll();
+
+        if (sizeof($result) > 0) {
+            return $result;
+        } else {
+            header('location: ' . URL . 'home/noresults');
+        }
+
+    }
+
+
+
+    /** --------------------------------------------------------------------------------------------------------
+     * FUNCTIONS TO POST NEW CONTACT NOTES
+    * --------------------------------------------------------------------------------------------------------*/  
 
     /**
      * Post a Sticky Note
@@ -373,6 +502,21 @@ class Model
                             ':sticky_text' => $data['ctac_note'],
                             
                             );
+
+        // useful for debugging: you can see the SQL behind above construction by using:
+        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
+
+        $query->execute($parameters);
+    }
+
+    /**
+     * Delete a sticky note
+     */
+    public function deleteSticky($id)
+    {
+        $sql = "DELETE FROM sticky WHERE sticky_ID = :id";
+        $query = $this->db->prepare($sql);
+        $parameters = array(':id' => $id);
 
         // useful for debugging: you can see the SQL behind above construction by using:
         // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
@@ -413,8 +557,7 @@ class Model
     }
 
     /**
-     * Update fishes list if called, sets extra2 = Y
-     * if we don't want it on the list anymore.
+     * Remove account from the list by setting crnt_extra2 to "Y"
      */
     public function delistAccount($acct, $seen)
     {
@@ -424,104 +567,13 @@ class Model
         $query->execute($parameters);
     }
 
-    /**
-     * Delete a sticky note
-     */
-    public function deleteSticky($id)
-    {
-        $sql = "DELETE FROM sticky WHERE sticky_ID = :id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':id' => $id);
 
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
-        $query->execute($parameters);
-    }
 
-    /**
-     * Account search
-    */
-    public function displayAccount($search)
-    {
-        // FORMAT A PHONE NUMBER SEARCH, WITH HYPHENS
-        if(preg_match( '/^(\d{3})\-(\d{3})\-(\d{4})$/', $search,  $matches ) ) {
-            $search = "(" . $matches[1] . ') ' .$matches[2] . '-' . $matches[3];
-        }
-        // FORMAT A PHONE NUMBER SEARCH, WITHOUT HYPHENS
-        if(preg_match( '/^(\d{3})(\d{3})(\d{4})$/', $search,  $matches ) ) {
-            $search = "(" . $matches[1] . ') ' .$matches[2] . '-' . $matches[3];
-        }
 
-        $sql = "SELECT * FROM fishes WHERE :search IN (crnt_acct,crnt_hmphone,crnt_email)";
-        $query = $this->db->prepare($sql);      
-        $parameters = array(':search' => $search);  
-        $query->execute($parameters);
-        $result = $query->fetchAll();
-
-        if (sizeof($result) > 0) {
-            return $result;
-        } else {
-            header('location: ' . URL . 'home/noresults');
-        }
-        
-    }
-
-    /**
-     * If there are multiple sub accounts, this adds up the total payments due
-     * and concatenates strings of the inventory and sub-account numbers.
-     */
-    public function addItUp($accountList) {
-        // Set all variables initially to nothing.
-        $totalPay = 0;
-        $totalInventory = "";
-        $totalSub = "";
-        $totalStudent = "";
-        // For first iteration, no divider.
-        $divider = "";
-        foreach ($accountList as $account) {
-            if ($accountList[0]->crnt_acct == $account->crnt_acct) {
-                $totalPay += $account->crnt_paymentdue;
-                $totalInventory .= $divider . $account->crnt_desc;
-                $totalSub .= " -" . $account->crnt_sub;
-                $totalStudent .= $divider . $account->crnt_student . ": " . $account->crnt_desc;
-            }
-            // Now we have a divider for subsequent iterations.
-            $divider = " | ";
-        }
-        // Create the object for use by home.php
-        $addedItems = (object) [
-            'payment' => $totalPay,
-            'inventory' => $totalInventory,
-            'sub' => $totalSub,
-            'student' => $totalStudent
-        ];
-        return $addedItems;
-    }
-
-    /**
-     * Gets the currently displayed customer data for inclusion in the
-     * customer-data tag n the footer, used by JavaScript for boilerplate
-     * text in the contact notes.
-     * 
-     * I'm not using the MySQL column header names for this, because I'm 
-     * not sure I want them visible in the HTML. Better safe than sorry.
-     */
-    public function customerData($account, $addItUp) {
-        $customerData =   '{"NAME": "' . htmlspecialchars($account->crnt_name) . 
-                        '", "DAYSLATE": "' . $account->crnt_extra1 . 
-                        '", "BALDUE": "' . number_format($addItUp->payment, 2) . 
-                        '", "DUEDATE": "' . $account->crnt_ndate . 
-                        '", "ACCT": "' . $account->crnt_acct . $addItUp->sub . 
-                        '", "BUSPHONE": "' . BUS_PHONE . 
-                        '", "BUSPAYMENT": "' . BUS_PAYMENT . 
-                        '", "INSTRUMENT": "' . $account->crnt_desc . 
-                        '", "STATEMENTDATE": "' . date('F j, Y') . 
-                        '", "BUSNAME": "' . BUS_NAME . 
-                        '"}';
-        return $customerData;
-    }
-
+    /** --------------------------------------------------------------------------------------------------------
+     * FUNCTIONS FOR EMAILING AND MASS MAILING
+    * --------------------------------------------------------------------------------------------------------*/  
 
     /**
      * Single mailer
@@ -580,27 +632,11 @@ class Model
     }
 
     /**
-     * Email personalizer, PHP version (there is an JavaScript version as well)
-     */
-    public function personalizer($text, $account) {
-        // Turn the account object into an array
-        $account = (array) $account;
-        // Loop through the array keys (i.e. column headers) and replace boilerplate placeholders 
-        // (which are the column header names in the data.json file)
-        $newText = str_replace(array_keys($account), $account, $text);
-        // Now replace store info placeholders with store info constants from the config file.
-        $newText = str_replace(["BUS_NAME", "BUS_PHONE", "BUS_SITE", "BUS_PAYMENT"], 
-                                [BUS_NAME, BUS_PHONE, BUS_SITE, BUS_PAYMENT], 
-                                $newText);
-        return $newText;
-    }
-
-    /**
      * Mass Mailer
      */
     public function massMailer($accountQuery, $storeData) {
         
-        // Go through the store data "mass-mailer" keys one at a time
+        // Go through the data.json "mass-mailer" keys one at a time
         foreach ($storeData->mass_mailer as $lateCategory => $elements) {
 
             // Loop through account list
@@ -624,7 +660,7 @@ class Model
     }
 
     /**
-     * Return array of bojects with data about the batches of accounts at certain lateness levels.
+     * Return array of objects with data about the batches of accounts at certain lateness levels. Used by the emailer.php page.
      * This is basically the same as the massMailer() function, but returns an array instead of mailing anyone.
      */
     public function emailBatches($accountQuery, $storeData) {
@@ -660,8 +696,7 @@ class Model
                 $thisBatch->emailBody = $this->personalizer($elements->body, $theseAccounts[0]);
             } else {
                 $thisBatch->emailBody = $elements->body;
-            }
-            
+            }            
 
             array_push($emailBatches, $thisBatch);
 
@@ -670,175 +705,21 @@ class Model
         return $emailBatches;
 
     }
-    
-    /**
-     * All Aging Category Totals
-     * Returns an object with the counts of each aging category
-     */
-    public function allAging() {
-
-        $accounts = $this->accountList("all", 0, 180);
-
-        $one = array_filter($accounts, function($account) {
-            return ($account->crnt_extra1 > 0 && $account->crnt_extra1 <11);
-        });
-        $eleven = array_filter($accounts, function($account) {
-            return ($account->crnt_extra1 > 10 && $account->crnt_extra1 <31);
-        });
-        $thirtyOne = array_filter($accounts, function($account) {
-            return ($account->crnt_extra1 > 30 && $account->crnt_extra1 <61);
-        });
-        $sixtyOne = array_filter($accounts, function($account) {
-            return ($account->crnt_extra1 > 60 && $account->crnt_extra1 <91);
-        });
-        $ninetyOne = array_filter($accounts, function($account) {
-            return ($account->crnt_extra1 > 90 && $account->crnt_extra1 <121);
-        });
-        $oneTwentyPlus = array_filter($accounts, function($account) {
-            return $account->crnt_extra1 > 120;
-        });
-
-        $aging = new stdClass();
-
-        $aging->all = count($accounts);
-        $aging->one = count($one);
-        $aging->eleven = count($eleven);
-        $aging->thirtyOne = count($thirtyOne);
-        $aging->sixtyOne = count($sixtyOne);
-        $aging->ninetyOne = count($ninetyOne);
-        $aging->oneTwentyPlus = count($oneTwentyPlus);
-
-        return $aging;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
     /**
-     * Get all songs from database
+     * Email personalizer, PHP version (there is an JavaScript version as well)
      */
-    public function getAllSongs()
-    {
-        $sql = "SELECT id, artist, track, link FROM song";
-        $query = $this->db->prepare($sql);
-        $query->execute();
-
-        // fetchAll() is the PDO method that gets all result rows, here in object-style because we defined this in
-        // core/controller.php! If you prefer to get an associative array as the result, then do
-        // $query->fetchAll(PDO::FETCH_ASSOC); or change core/controller.php's PDO options to
-        // $options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ...
-        return $query->fetchAll();
+    public function personalizer($text, $account) {
+        // Turn the account object into an array
+        $account = (array) $account;
+        // Loop through the array keys (i.e. MySQL column headers) and replace boilerplate placeholders 
+        // (which are the column header names in the data.json boilerplate text)
+        $newText = str_replace(array_keys($account), $account, $text);
+        // Now replace store info placeholders with store info constants from the config file.
+        $newText = str_replace(["BUS_NAME", "BUS_PHONE", "BUS_SITE", "BUS_PAYMENT"], 
+                                [BUS_NAME, BUS_PHONE, BUS_SITE, BUS_PAYMENT], 
+                                $newText);
+        return $newText;
     }
 
-    /**
-     * Add a song to database
-     * TODO put this explanation into readme and remove it from here
-     * Please note that it's not necessary to "clean" our input in any way. With PDO all input is escaped properly
-     * automatically. We also don't use strip_tags() etc. here so we keep the input 100% original (so it's possible
-     * to save HTML and JS to the database, which is a valid use case). Data will only be cleaned when putting it out
-     * in the views (see the views for more info).
-     * @param string $artist Artist
-     * @param string $track Track
-     * @param string $link Link
-     */
-    public function addSong($artist, $track, $link)
-    {
-        $sql = "INSERT INTO song (artist, track, link) VALUES (:artist, :track, :link)";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-    }
-
-    /**
-     * Delete a song in the database
-     * Please note: this is just an example! In a real application you would not simply let everybody
-     * add/update/delete stuff!
-     * @param int $song_id Id of song
-     */
-    public function deleteSong($song_id)
-    {
-        $sql = "DELETE FROM song WHERE id = :song_id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-    }
-
-    /**
-     * Get a song from database
-     */
-    public function getSong($song_id)
-    {
-        $sql = "SELECT id, artist, track, link FROM song WHERE id = :song_id LIMIT 1";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':song_id' => $song_id);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-
-        // fetch() is the PDO method that get exactly one result
-        return $query->fetch();
-    }
-
-    /**
-     * Update a song in database
-     * // TODO put this explaination into readme and remove it from here
-     * Please note that it's not necessary to "clean" our input in any way. With PDO all input is escaped properly
-     * automatically. We also don't use strip_tags() etc. here so we keep the input 100% original (so it's possible
-     * to save HTML and JS to the database, which is a valid use case). Data will only be cleaned when putting it out
-     * in the views (see the views for more info).
-     * @param string $artist Artist
-     * @param string $track Track
-     * @param string $link Link
-     * @param int $song_id Id
-     */
-    public function updateSong($artist, $track, $link, $song_id)
-    {
-        $sql = "UPDATE song SET artist = :artist, track = :track, link = :link WHERE id = :song_id";
-        $query = $this->db->prepare($sql);
-        $parameters = array(':artist' => $artist, ':track' => $track, ':link' => $link, ':song_id' => $song_id);
-
-        // useful for debugging: you can see the SQL behind above construction by using:
-        // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
-        $query->execute($parameters);
-    }
-
-    /**
-     * Get simple "stats". This is just a simple demo to show
-     * how to use more than one model in a controller (see application/controller/songs.php for more)
-     */
-    public function getAmountOfSongs()
-    {
-        $sql = "SELECT COUNT(id) AS amount_of_songs FROM song";
-        $query = $this->db->prepare($sql);
-        $query->execute();
-
-        // fetch() is the PDO method that get exactly one result
-        return $query->fetch()->amount_of_songs;
-    }
 }

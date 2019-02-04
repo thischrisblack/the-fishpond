@@ -65,7 +65,7 @@ define('DB_CHARSET', 'utf8');
 date_default_timezone_set('America/Phoenix');
 
 /**
- * Set your login password.
+ * Set your FIshpond login password.
  */
 define('FISHPOND_PASSWORD', "password");
 
@@ -75,8 +75,9 @@ define('FISHPOND_PASSWORD', "password");
 define('BUS_NAME', 'Our Store');
 define('BUS_PHONE', '(555) 555-1212');
 define('BUS_SITE', 'www.ourstore.com');
-// If online payments are possible:
+// If online payments are possible, this is the URL for them:
 define('BUS_PAYMENT', 'www.ourstore.com/payment');
+// If your store runs the AIMsi autopay module, set this to Y
 define('BUS_APAY', 'Y');
 
 /**

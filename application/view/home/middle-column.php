@@ -7,7 +7,7 @@
     <section class="row account-info">
 
         <div ID="stock-pond-warning" class="alert alert-danger">
-            <b>WARNING!</b> The pond hasn't been stocked since <?php echo  date('l, F jS \a\t g:i a', $lastStocked)?>. This information is out of date. You must stock the pond or annoying our customers with calls after they've paid!
+            <b>WARNING!</b> The pond hasn't been stocked since <?php echo  date('l, F jS \a\t g:i a', $lastStocked)?>. This information is out of date. You must stock the pond or risk annoying our customers with calls after they've paid!
         </div>
 
         <!-- Left column -->
@@ -69,7 +69,7 @@
 
     <!-- Contact Action Input Area--> 
     
-    <form action="<?php echo URL; ?>" method="POST">
+    <form action="<?php echo URL; ?>home/newContact" method="POST">
     <!-- Action Row --->
     <section class="row action">
         

@@ -1,7 +1,6 @@
 <?php 
 /**
  * Class Stock
- *
  */
 class Stock extends Controller
 {
@@ -18,7 +17,7 @@ class Stock extends Controller
         // Get online payment data
         $onlinePayments = $this->model->getOnlinePayments();
 
-        // Get aging totals object.
+        // Get aging totals object for navbar.
         $aging = $this->model->allAging();
 
         // load views. 
@@ -29,6 +28,7 @@ class Stock extends Controller
 
     /**
      * ACTION: Mark an online payment as seen and get it out of the list
+     * Handled by JavaScript/Ajax query.
      */
     public function paymentSeen($paymentID)
     {
@@ -37,8 +37,8 @@ class Stock extends Controller
     
     /**
      * ACTION: pondStock
-     * This is the procedure for uploading the AIMsi datafile to the Fishpond,
-     * and cleaning it up for our use.
+     * This is the procedure for uploading the AIMsi data to the Fishpond,
+     * and then cleaning it up for our use.
      */
     public function pondStock()
     {
@@ -48,33 +48,36 @@ class Stock extends Controller
 
         // if we have POST data to stock the pond.
         if (isset($_POST["stock_the_pond"])) {
-            // Upload CSV file to database
-            $this->model->stockPond($_POST["fishes"]);       
+
+            // Send the pasted text to the stockPond function
+            $this->model->stockPond($_POST["fishes"]);
+            
+            // Delete all accounts that are paid off.
+            $this->model->clearPaid();
+
+            // Clear both 'extra' fields for future use
+            $this->model->clearExtras();
+
+            // Delete accounts where there is no contact info
+            $this->model->clearNoContact();
+
+            // Get the acccount list object for the next functions
+            $accounts = $this->model->accountList("all", -1, 1000);
+
+            // Delete all accounts that aren't past due.
+            $this->model->clearCurrent($accounts);
+
+            // Calculate days late and add it to the database in the extra1 field
+            $this->model->daysLate($accounts);
+
+            // Update the paymentdue field with correctly calculated amount
+            $this->model->dueCalc($accounts);
+
         }
-
-        // Delete all accounts that are paid off.
-        $this->model->clearPaid();
-
-        // Clear both 'extra' fields for future use
-        $this->model->clearExtras();
-
-        // Delete accounts where there is no contact info
-        $this->model->clearNoContact();
-
-        // Get the acccount list object for next functions
-        $accounts = $this->model->accountList("all", -1, 1000);
-
-        // Delete all accounts that aren't past due.
-        $this->model->clearCurrent($accounts);
-
-        // Calculate days late and add it to the database in the extra1 field
-        $this->model->daysLate($accounts);
-
-        // Update the paymentdue field with correctly calculated amount
-        $this->model->dueCalc($accounts);
-
-        // where to go after pond has been stocked
+        
+        // Where to go after pond has been stocked, the emailer page.
         header('location: ' . URL . 'emailer');
+
     }
     
 }

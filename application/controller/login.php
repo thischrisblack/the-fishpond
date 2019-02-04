@@ -1,7 +1,6 @@
 <?php 
 /**
- * Class Login
- *
+ * Class Login *
  */
 class Login extends Controller
 {
@@ -14,7 +13,7 @@ class Login extends Controller
         // Set body class for javascript
         $bodyID="login";
 
-        // Get aging totals object.
+        // Get aging totals object for navbar.
         $aging = $this->model->allAging();
 
         if (isset($_POST["password"])) {

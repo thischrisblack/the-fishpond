@@ -40,6 +40,8 @@
 
         <ul class="payment-list">
 
+        <li ID="payment-list-title">Payments received since last pond stock:</li>
+
             <?php
 
                 foreach($onlinePayments as $payment) {
@@ -65,7 +67,7 @@
     </section>
     
 
-    <section class="alert alert-info" ID="aimsi-instructions">
+    <section class="alert alert-light" ID="aimsi-instructions">
 
         <h4>Getting the AIMsi data</h4>
 

@@ -23,7 +23,7 @@ class Emailer extends Controller
         // Get the different mass email batch info
         $emailBatches = $this->model->emailBatches($accountQuery, $storeData);
 
-        // Get aging totals object.
+        // Get aging totals object for the navbar.
         $aging = $this->model->allAging();
 
         if (isset($_POST["submit"])) {
@@ -33,9 +33,6 @@ class Emailer extends Controller
 
             // Email them!
             $this->model->massMailer($accountQuery, $storeData);
-
-            // Just for simulation.
-            sleep(5);
 
             // where to go after accounts are mailed
             header('location: ' . URL . 'emailer/startfishing');
@@ -54,7 +51,7 @@ class Emailer extends Controller
     public function startfishing()
     {
 
-        // Get aging totals object.
+        // Get aging totals object for the navbar.
         $aging = $this->model->allAging();
 
         require APP . 'view/_templates/header.php';

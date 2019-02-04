@@ -4,12 +4,6 @@ General Styles
 
 -------------------------------*/
 
-/* Fonts
-font-family: 'IBM Plex Mono', monospace;
-font-family: 'Roboto Mono', monospace;
-font-family: 'Source Sans Pro', sans-serif;
-*/
-
 body {
     font-family: 'Source Sans Pro', sans-serif;
 }
@@ -20,6 +14,20 @@ h1 {
 
 textarea {
     margin: 20px 0 20px 0;
+}
+
+code {
+    background: #eee;
+    padding: 3px 8px;
+    border: 1px solid #555;
+    border-radius: 10%;
+    color: black;
+    margin: 0px 10px;
+}
+
+.alert-light {
+    color: black;
+    background: #fafafa;
 }
 
 /* Column header (also heads history column) */
@@ -229,11 +237,7 @@ Middle column: Contact Area
 
 
 
-/*------------------------------
-
-Right column: the history area. 
-
--------------------------------*/
+/*------------------------------Right column: the history area-------------------------------*/
 
  /* The history column itself */
  .right-column {
@@ -245,6 +249,7 @@ Right column: the history area.
  .history-action {
     font-size: 90%;
     color: #000;
+    font-weight: bold;
  }
 .history-date {
     float: right;
@@ -254,6 +259,9 @@ Right column: the history area.
     font-size: 75%;
     color: #999;
 }
+
+
+
 
 
 /*-------------------------------------------------------
@@ -278,6 +286,16 @@ The Pond Stocker Page
     padding-left: 0;
 }
 
+#payment-list-title {
+    border: 0px solid #ddd;
+    padding: 3px 5px;
+    margin-top: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 65%;
+    background: #edfeff;
+    font-weight: bold;
+}
+
 .payment-list-item {
     border: 0px solid #ddd;
     padding: 3px 5px;
@@ -288,14 +306,13 @@ The Pond Stocker Page
 }
 
 .payment-delete {
-    font-size: 100%;
-    font-weight: bold;
+    font-size: 90%;
 }
 
 #get-aimsi-instructions {
     cursor: pointer;
-    font-weight: bold;
     font-size: 90%;
+    color: #007bff
 }
 
 #aimsi-instructions {

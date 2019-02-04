@@ -7,7 +7,7 @@ class Home extends Controller
 {
     /**
      * PAGE: index
-     * This method handles what happens when you move to http://yourproject/home/index (which is the default page btw)
+     * This is the default page.
      */
     public function index()
     {
@@ -18,21 +18,17 @@ class Home extends Controller
         // Set session variables
         $session = $this->model->setSessionVariables(); 
 
-        // session_destroy();
-
-        // Check for new contact note.
-        if (isset($_POST["contact"])) {
-            $this->newContact();
-        }
-
-        // Check for account search    
+        /**
+         * Determine whether to display single account or the account list, depending upon if
+         * a search was made from the search field. Is there a better way?
+         */
         if (isset($_GET["lookup"])) {
-            // Account query on the lookup value (account#, phone#, email)
+            // If it's a search, run account query on the lookup value (account#, phone#, email)
             $accountQuery = $this->model->displayAccount($_GET["lookup"]);
             // Text for left column header in it's a lookup rather than the full list.
             $listHeader = "Account:";
         } else {
-            // If no search get the account list
+            // If no search, get the full account list
             $minmax = explode("-", $session->minmax);
             $min = $minmax[0];
             $max = $minmax[1];
@@ -42,7 +38,7 @@ class Home extends Controller
             // $listHeader = count($accountQuery) . " ACCOUNTS";
         }
 
-        // Get aging totals object.
+        // Get aging totals object for the navbar.
         $aging = $this->model->allAging();
 
         // Account history for the first account in the result set (i.e. the one displayed)
@@ -51,7 +47,7 @@ class Home extends Controller
         // Sticky notes for that account.
         $accountSticky = $this->model->accountSticky($accountQuery[0]->crnt_acct); 
 
-        // Get an object of totalled things for when there are multiple subs on one account
+        // Get an object of totalled things (payment due, rented inventory, etc.) for when there are multiple subs on one account
         $addItUp = $this->model->addItUp($accountQuery);
 
         // Get the data JSON
@@ -60,7 +56,7 @@ class Home extends Controller
         // Get the laststocked.txt value
         $lastStocked = file_get_contents(ROOT . 'public/laststocked.txt');
 
-        // This customer data (for the data tag in the right column)
+        // This customer data (for the data tag in the right column, used by JavaScript)
         $customerData = htmlspecialchars($this->model->customerData($accountQuery[0], $addItUp));
 
         // load views
@@ -82,7 +78,6 @@ class Home extends Controller
             // Use postSticky();
             $this->model->postSticky($_POST);
         } else {
-            // It's not a sticky note.
             // If the SKIP button was used, change action to "Skipped."
             if ($_POST["contact"] == "SKIP") $_POST["ctac_action"] = "Skipped";
 
@@ -94,13 +89,9 @@ class Home extends Controller
                 $this->model->singleMailer($_POST["ctac_email"], $_POST["ctac_name"], $_POST["ctac_note"]);
             }             
 
-            // Sets crnt_extra2 to Y if account to be removed, and to N otherwise.
+            // Sets crnt_extra2 to Y if account to be removed (i.e. the "Keep Account Open" box is unchecked).
             $_POST["crnt_extra2"] = isset($_POST["crnt_extra2"]) ? $_POST["crnt_extra2"] : "Y";
-            $this->model->delistAccount($_POST["ctac_acct"], $_POST["crnt_extra2"]);
-
-
-            // Get the lanid value for the employee dropdown.
-            $ctac_lanid = $_POST["ctac_lanid"];            
+            $this->model->delistAccount($_POST["ctac_acct"], $_POST["crnt_extra2"]);        
         }
 
         // where to go after contact note has been posted
@@ -114,7 +105,6 @@ class Home extends Controller
     {
         // if we have an id of a sticky note that should be deleted
         if (isset($id)) {
-            // do deleteSong() in model/model.php
             $this->model->deleteSticky($id);
         }
 
@@ -123,13 +113,14 @@ class Home extends Controller
     }
 
     /**
-     * PAGE: No results :(
+     * PAGE: No results
      */
     public function noResults()
     {
         // Set session variables
         $session = $this->model->setSessionVariables(); 
 
+        // Get aging object for navbar
         $aging = $this->model->allAging();
         
         // load views
@@ -139,13 +130,14 @@ class Home extends Controller
     }
 
     /**
-     * PAGE: No more fish :)
+     * PAGE: No more fish
      */
     public function done()
     {
         // Set session variables
         $session = $this->model->setSessionVariables(); 
         
+        // Get aging object for navbar and to see if there are any accounts left at all.
         $aging = $this->model->allAging();
         
         // load views
