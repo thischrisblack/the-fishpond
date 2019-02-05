@@ -1,7 +1,7 @@
 <!-- Account Area -->
 <section class="col-sm-7 middle-column">
 
-    <!-- Top row -->
+    <!-- Top row: Account Info -->
     <section class="row account-info">
 
         <!-- This div made visible by JavaScript if pond has not been stocked in X number of hours -->
@@ -73,7 +73,7 @@
     <!-- Action Row --->
     <section class="row action">
         
-        <!--Left Column: Employee selector-->
+        <!--Action Row Left Column: Employee selector-->
         <section class="col-sm-4">
             <select class="form-control form-control-sm" name="ctac_lanid" required>
 
@@ -92,7 +92,7 @@
             </select>
         </section>
 
-        <!--Middle Column: Action selector-->
+        <!-- Action Row Middle Column: Action selector -->
         <section class="col-sm-4">
             <select class="form-control form-control-sm" name="ctac_action" id="ctac_action" autofocus>
                 <option value="CC Declined">CC Declined</option>
@@ -113,7 +113,7 @@
 
         </section>
 
-        <!--Right Column: Additioanl Action Dropdowns, all hidden until revealed by action selector-->
+        <!-- Action Row Right Column: Additioanl Action Dropdowns, all hidden until revealed by action selector -->
         <section class="col-sm-4">
 
             <!--Emailed-->

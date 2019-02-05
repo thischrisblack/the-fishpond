@@ -65,7 +65,7 @@ define('DB_CHARSET', 'utf8');
 date_default_timezone_set('America/Phoenix');
 
 /**
- * Set your FIshpond login password.
+ * Set your Fishpond login password.
  */
 define('FISHPOND_PASSWORD', "password");
 
@@ -83,7 +83,7 @@ define('BUS_APAY', 'Y');
 /**
  * PHPMailer info
  */
-define('EMAIL_ADDRESS', 'youremailaddress@gmail.com');
+define('EMAIL_ADDRESS', 'youremailaddress@youremailprovider.com');
 define('EMAIL_NAME', 'Your Name');
 define('EMAIL_PASSWORD', 'Your Password');
 define('EMAIL_SUBJECT', 'Your Default Subject');

@@ -61,14 +61,15 @@
                 </li>
             </ul> 
 
-            <!-- Search fomr -->            
+            <!-- Search form -->            
             <form class="form-inline" action="<?php echo URL; ?>" method="get">
-                <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="lookup">
+                <input class="form-control" type="search" placeholder="Acct #, email, or phone" aria-label="Search" name="lookup">
             </form>
 
             <!-- Pond stocker link -->
             <span class="nav navbar-text">
               <a href="<?php echo URL; ?>stock" class="nav-stock-link">
+                <!-- This image flashes when the pond hasn't been stocked. -->
                 <img src="<?php echo URL; ?>img/stock-white.svg" height="30" alt="Refresh List" ID='stock-link-img'>
               </a>
             </span>
