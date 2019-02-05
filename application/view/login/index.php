@@ -18,7 +18,7 @@
 
     <form action="<?php echo URL; ?>login" method="POST">
 
-        <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" autofocus>
+        <input type="password" name="password" class="form-control" placeholder="Password" autofocus>
 
     </form>
 

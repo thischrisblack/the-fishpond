@@ -1,6 +1,10 @@
 <?php     
 
-// PHPMailer
+/**
+ * PHPMailer.
+ * Is this where this goes? In the model? THings get mailed from the singleMailer() function below,
+ * so ... I don't know.
+ */
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Model
@@ -46,9 +50,6 @@ class Model
         }
         if (!isset($_SESSION["apay"])) {
             $_SESSION["apay"] = "all";
-        }
-        if (!isset($_SESSION["ctac_lanid"])) {
-            $_SESSION["ctac_lanid"] = "";
         }
 
         // If there is $_GET data, set the appropriate session variable.
@@ -328,7 +329,7 @@ class Model
 
     /**
      * All Aging Category Totals
-     * Returns an object with the counts of each aging category
+     * Returns an object with the counts of each aging category.
      * This data is used in the navbar, and in the "done" page.
      */
     public function allAging() {
@@ -426,7 +427,7 @@ class Model
 
     /**
      * Gets the currently displayed customer data for inclusion in the
-     * customer-data tag n the footer, used by JavaScript for boilerplate
+     * customer-data tag in the right column, used by JavaScript for boilerplate
      * text in the contact notes.
      * 
      * I'm not using the MySQL column header names for this, because I'm 
@@ -623,12 +624,16 @@ class Model
         //Replace the plain text body with one created manually
         $mail->AltBody = $custMessage;
 
-        //send the message, check for errors
-        if (!$mail->send()) {
-            echo "Mailer Error: " . $mail->ErrorInfo;
-        } else {
-            echo "Message sent!";
-        }
+        
+        /**
+         * Actual sending of mail commented out for testing!
+         */
+         
+        // if (!$mail->send()) {
+        //     echo "Mailer Error: " . $mail->ErrorInfo;
+        // } else {
+        //     echo "Message sent!";
+        // }
     }
 
     /**
@@ -695,6 +700,7 @@ class Model
             if (sizeof($theseAccounts) > 0) {
                 $thisBatch->emailBody = $this->personalizer($elements->body, $theseAccounts[0]);
             } else {
+                // If there's no account, I still want to se the boilerplate text.
                 $thisBatch->emailBody = $elements->body;
             }            
 

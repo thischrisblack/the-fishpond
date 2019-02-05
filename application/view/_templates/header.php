@@ -15,7 +15,7 @@
 
     <div class="container">
 
-        <!-- NAVIGATION-->
+        <!-- Navigation -->
         <nav class="row navbar bg-dark">
 
             <!-- Brand -->
@@ -61,11 +61,12 @@
                 </li>
             </ul> 
 
-            <!-- SEARCH -->            
+            <!-- Search fomr -->            
             <form class="form-inline" action="<?php echo URL; ?>" method="get">
                 <input class="form-control" type="search" placeholder="Search" aria-label="Search" name="lookup">
             </form>
 
+            <!-- Pond stocker link -->
             <span class="nav navbar-text">
               <a href="<?php echo URL; ?>stock" class="nav-stock-link">
                 <img src="<?php echo URL; ?>img/stock-white.svg" height="30" alt="Refresh List" ID='stock-link-img'>

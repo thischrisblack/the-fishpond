@@ -17,10 +17,15 @@ class Home extends Controller
         
         // Set session variables
         $session = $this->model->setSessionVariables(); 
+        
+        // Check for new contact note.
+        if (isset($_POST["contact"])) {
+            $this->newContact();
+        }
 
         /**
          * Determine whether to display single account or the account list, depending upon if
-         * a search was made from the search field. Is there a better way?
+         * a search was made from the search field. 
          */
         if (isset($_GET["lookup"])) {
             // If it's a search, run account query on the lookup value (account#, phone#, email)
@@ -71,7 +76,7 @@ class Home extends Controller
      * ACTION: New contact note
      */
     public function newContact()
-    {        
+    {
 
         // Check if it's a sticky note
         if ($_POST["ctac_action"] == "Sticky Note") {

@@ -12,7 +12,7 @@
 
     foreach ($emailBatches as $batch) { ?>
 
-    <div class="mass-mailer-group">
+    <div class="mass-mailer-batch">
 
         
         <h3><?php echo $batch->daysLate . " days: \"" . $batch->latenessCategory . "\""?></h3>
@@ -34,7 +34,9 @@
 
 
     <form action="<?php echo URL; ?>emailer" method="POST">
+
         <input type="submit" name="submit" value="EMAIL THEM" class="btn btn-danger btn-sm form-control" ID="emailer-submit">
+        
     </form>
 
     <br>

@@ -88,9 +88,7 @@
             <li>Select any cell and then press CTRL-A to select the entire sheet, and CTRL-C to copy it.</li>
             <li>Come back to this page, put the cursor in the box below, and press CTRL-V to paste the data. It will look weird, but leave it as it is!</li>
             <li>Click "Upload Fishes!"</li>
-        </ol>
-
-    
+        </ol>    
     
     </section>
 
@@ -104,7 +102,6 @@
     <p class="alert alert-danger">
         NOTE: Depending upon how much data you have, this may take a while. Do NOT hit the upload button again. 
     </p>
-
 
 </section>
 

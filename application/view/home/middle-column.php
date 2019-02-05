@@ -1,16 +1,15 @@
-
-
 <!-- Account Area -->
 <section class="col-sm-7 middle-column">
 
     <!-- Top row -->
     <section class="row account-info">
 
+        <!-- This div made visible by JavaScript if pond has not been stocked in X number of hours -->
         <div ID="stock-pond-warning" class="alert alert-danger">
             <b>WARNING!</b> The pond hasn't been stocked since <?php echo  date('l, F jS \a\t g:i a', $lastStocked)?>. This information is out of date. You must stock the pond or risk annoying our customers with calls after they've paid!
         </div>
 
-        <!-- Left column -->
+        <!-- Account info: Left column, name, phone, etc -->
         <section class="col-sm-8 account-left">
 
             <div class="account-detail">
@@ -23,7 +22,7 @@
                 
             </div>
 
-
+            <!--Sticky notes-->
             <div class="sticky-notes-area">
                 <?php if ($accountSticky) { 
                     foreach ($accountSticky as $sticky) { ?>  
@@ -49,7 +48,7 @@
             
         </section>
 
-        <!-- Right Column -->
+        <!-- Account info: Right Column. Balance and payment info. -->
         <section class="col-sm-4 account-right">
             <h1>$<?php echo number_format($addItUp->payment, 2)?></h1>
             due <?php echo $accountQuery[0]->crnt_ndate; ?><br>
@@ -65,11 +64,12 @@
         </section>
 
     </section>
-    <!-- End top row -->
+    <!-- End Account Info row -->
 
     <!-- Contact Action Input Area--> 
     
-    <form action="<?php echo URL; ?>home/newContact" method="POST">
+    <form action="<?php echo URL; ?>" method="POST">
+
     <!-- Action Row --->
     <section class="row action">
         
@@ -78,10 +78,10 @@
             <select class="form-control form-control-sm" name="ctac_lanid" required>
 
                 <?php
-                // If $ctac_lanid not set, ask to set caller
-                if ($session->lanid == "") echo "<option value=\"\">Select Caller</option>"; 
+                // If $ctac_lanid not set, ask to set employee
+                if ($session->lanid == "") echo "<option value=\"\">Select Employee</option>"; 
 
-                // Get list of store employees from JSON and populate options
+                // Get list of store employees from data.json and populate options
                 foreach ($storeData->employees as $caller) {
                     echo "<option value=\"$caller\"";
                     // If ctac_lanid is set, make it selected
@@ -106,9 +106,9 @@
                 <option value="LM with ...">LM with ...</option>
                 <option value="No Answer / No VM">No Answer / No VM</option>
                 <option value="Other">Other</option>
-                <option value="Paid">Paid</option> <!-- Add script-->
-                <option value="Promised-Payment">Promised Payment</option> <!-- Add script-->
-                <option value="Sticky Note">Sticky Note</option> <!-- Add script-->
+                <option value="Paid">Paid</option>
+                <option value="Promised-Payment">Promised Payment</option>
+                <option value="Sticky Note">Sticky Note</option> 
             </select>
 
         </section>
@@ -135,6 +135,7 @@
 
             <!--Promised Payment-->
             <input class="form-control form-control-sm action-calendar action-options" type="date" id="Promised-Payment">
+
         </section>
     
     </section>
@@ -166,7 +167,8 @@
             <input type="hidden" name="ctac_name" value="<?php echo $accountQuery[0]->crnt_name?>">
             <input type="hidden" name="ctac_daysLate" value="<?php echo $accountQuery[0]->crnt_extra1?>">
             <input type="hidden" name="ctac_date" value="<?php echo time();?>">
-            <!-- SKip this account -->
+            
+            <!-- Skip this account -->
             <input type="submit" name="contact" value="SKIP" class="btn btn-danger btn-sm">
             <!-- Save action -->
             <input type="submit" name="contact" value="SAVE" class="btn btn-success btn-sm">

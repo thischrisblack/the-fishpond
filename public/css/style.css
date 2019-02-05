@@ -1,8 +1,6 @@
-/*------------------------------
-
-General Styles
-
--------------------------------*/
+/** --------------------------------------------------------------------------------------------------------
+ * GENERAL STYLES
+** -------------------------------------------------------------------------------------------------------*/
 
 body {
     font-family: 'Source Sans Pro', sans-serif;
@@ -35,14 +33,11 @@ code {
     font-weight: bold;
     font-size: 120%;
     padding: 10px 0px 8px 3px;
-    /* border-bottom: 1px solid #999; */
 }
 
-/*------------------------------
-
-Navigation
-
--------------------------------*/
+/** --------------------------------------------------------------------------------------------------------
+ * NAVIGATION
+** -------------------------------------------------------------------------------------------------------*/
 
 .navbar {
     margin-bottom: .5em;
@@ -79,89 +74,60 @@ Navigation
     color: #ddd;
 }
 
+/** --------------------------------------------------------------------------------------------------------
+ * LEFT COLUMN: ACCOUNT LIST
+** -------------------------------------------------------------------------------------------------------*/
 
-/*-------------------------------------------------------
-
-The Main Page
-
---------------------------------------------------------*/
-
-/* The list column itself */
 .left-column { 
     font-family: 'Roboto Mono', monospace;
 }
 
-
-/*------------------------------
-
-Left column: Account List Area
-
--------------------------------*/
-
-/* The <ul> holding the account list */
 .account-list {
     list-style-type: none;
     padding-left: 0;
     font-size: 70%;
     color: #aaa;
 }
-/* The <li> items in the account list */
+
 .account-list-item {
     margin-top: 3px;
     border-bottom: 1px solid #f3f3f3;
 }
 
-.account-list-item:hover {
-    background: #eee;
-}
 .account-list-item a {
     color: black;
 
 }
-/* The 'days late' <span> in each list item */
+
 .account-list-days-late {
     display: inline;
     margin: 0 10px 0 10px;
 }
+
 .account-list-bal-due {
     float: right;
 }
 
-
-/*------------------------------
-
-Middle column: Account Area
-
--------------------------------*/
+/** --------------------------------------------------------------------------------------------------------
+ * MIDDLE COLUMN: ACCOUNT INFO
+** -------------------------------------------------------------------------------------------------------*/
 
 #stock-pond-warning {
     display: none;
 }
 
-/* The account column itself */
-.middle-column {
-    /* border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd; */
-    /* padding: 20px; */
-}
-/* Top row, the acount info display */
 .account-info {
     font-size: 110%;
 }
-/* Left column, the contact details */
-.account-left h3 {
-
-}
 
 /* Sticky notes! */
-.sticky-notes-area {
-}
 .sticky-note {
     font-size: 100%;
     padding: 1em;
     margin: 20px 0px 20px 0px;
     background: #fffdc9;
 }
+
 .sticky-delete {
     float: right;
     margin-top: -1em;
@@ -170,57 +136,33 @@ Middle column: Account Area
     clear: left;
     font-size: 120%;
 }
+
 .sticky-note-info {
     font-size: 80%;
     display: block;
     text-align: right;
 }
 
-/* Account number, name, student, etc/ */
-.account-detail {
-
-}
-
-/* Right column, the payment details */
 .account-right {
 text-align: right;    
 }
 
-/* Autopay indicator */
 .autopay-alert {
     color: red;
     font-weight: bold;
 }
 
+/** --------------------------------------------------------------------------------------------------------
+ * CONTACT ACTION ROW
+** -------------------------------------------------------------------------------------------------------*/
 
-/*------------------------------
 
-Middle column: Contact Area
-
--------------------------------*/
-
-/* Action row */
 .action {
     margin-top: 20px;
 }
 
-/* Input row */
-.action-input {
-    
-}
-
 .action-options, .action-calendar {
     display: none;
-}
-
-/* Save row */
-.action-save {
-    
-}
-
-/* Save row */
-.action-delist {
-    font-size: 80%;
 }
 
 /* The textarea */
@@ -229,46 +171,37 @@ Middle column: Contact Area
     height: 100px;
 }
 
-/* The save button area */
 .contact-save {
     text-align: right;
 }
 
-
-
-
-/*------------------------------Right column: the history area-------------------------------*/
-
- /* The history column itself */
- .right-column {
- }
+/** --------------------------------------------------------------------------------------------------------
+ * RIGHT COLUMN: ACCOUNT HISTORY
+** -------------------------------------------------------------------------------------------------------*/
 
  .history-item {
     margin-bottom: 10px;
  }
+
  .history-action {
     font-size: 90%;
     color: #000;
     font-weight: bold;
  }
+
 .history-date {
     float: right;
 }
+
 .history-note {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 75%;
     color: #999;
 }
 
-
-
-
-
-/*-------------------------------------------------------
-
-The Pond Stocker Page
-
---------------------------------------------------------*/
+/** --------------------------------------------------------------------------------------------------------
+ * POND STOCKER PAGE
+** -------------------------------------------------------------------------------------------------------*/
 
 .pond-stock {
     font-size: 120%;
@@ -338,17 +271,13 @@ The Pond Stocker Page
     display: none;
 }
 
+/** --------------------------------------------------------------------------------------------------------
+ * EMAILER PAGE
+** -------------------------------------------------------------------------------------------------------*/
 
+/* Uses some pond-stock classes */
 
-/*-------------------------------------------------------
-
-The Mass Mailer Page
-
---------------------------------------------------------*/
-
-/* Uses some pond-stock column classes */
-
-.mass-mailer-group {
+.mass-mailer-batch {
     margin-bottom: 30px;
 }
 
@@ -360,4 +289,3 @@ The Mass Mailer Page
     background: #fafafa;
     padding: 20px;
 }
-

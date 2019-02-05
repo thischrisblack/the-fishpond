@@ -1,23 +1,19 @@
-// Get the page body class
+// Get the page body ID
 var thisPage = document.querySelector('body').id;
 
 
-/**
- * Main page js
- */
+/** --------------------------------------------------------------------------------------------------------
+ * MAIN PAGE
+** -------------------------------------------------------------------------------------------------------*/
 if (thisPage === 'list') {
 
-    // Get the JSON file with the store data in it.
-    // Learned this here: https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON
-    // let dataURL = document.querySelector('#JSON').value;
     let request = new XMLHttpRequest();
-    request.open('GET', dataURL);
+    request.open('GET', dataURL); // This variable defined in the script tag of the template footer.
     request.responseType = 'json';
     request.send();
     request.onload = function() {
 
         // Any functions needing that JSON data must be in here.
-        // Here is the data.
         let storeData = request.response;
 
         // Set event handler on action option dropdown
@@ -30,7 +26,7 @@ if (thisPage === 'list') {
                 let actionOption = list.target.value;
                 // This is the messge to appear in the contact note box, from the data.json file.
                 let contactNote = storeData.messages[actionOption] ? storeData.messages[actionOption] : '';
-                // Send message through personalizer
+                // Send message through personalizer, in case it's an email
                 contactNote = personalizer(contactNote);
                 contactNoteBox.innerHTML = contactNote;
             });
@@ -38,14 +34,13 @@ if (thisPage === 'list') {
 
         // Set event handler on Promised Payment calendar
         let actionCalendar = document.querySelector('.action-calendar');
-        actionCalendar.addEventListener("change", date => {
-            
+        actionCalendar.addEventListener("change", date => {            
             contactNoteBox.innerHTML = date.target.value;
         });
     }
 
     // Set active CSS on selected filters.
-    // The #filters data tag is filled in with $_SESSION data by PHP
+    // The #filters data tag in the HTML left column file is filled in with $_SESSION data by PHP
     let filters = document.querySelector('#filters').value.split('%');
     let aging = filters[0];
     let apay = filters[1];
@@ -59,7 +54,7 @@ if (thisPage === 'list') {
         document.getElementById('ctac_note').innerHTML = '';
         // Get the selected action value
         var val = this.options[this.selectedIndex].value;
-        // Get all elements in the rigth column (class="action-options")
+        // Get all elements in the right account column (class="action-options")
         var allActionOptions = document.querySelectorAll('.action-options');        
         // For each one, toggle display depending upon their ID vs the selected action
         allActionOptions.forEach(el => {
@@ -72,10 +67,9 @@ if (thisPage === 'list') {
     var lastStocked = document.querySelector('#laststocked').value;
     var timeNow = Math.round((new Date()).getTime() / 1000);
 
-    // Flash the fish if pond hasn't been stocked in 'hourLimit' hours
-    var hourLimit = 12; // Number of hours before fish flashes
+    // Flash the pond-stock link if pond hasn't been stocked in 'hourLimit' hours
+    var hourLimit = 12; 
     if (((timeNow - lastStocked) / 3600) > hourLimit) {
-        // Alternate between red fish and white fish.
         var fish = "./img/stock-white.svg";
         setInterval(function() {
             document.querySelector('#stock-link-img').src = fish;
@@ -84,7 +78,7 @@ if (thisPage === 'list') {
     }
 
     // Show the alert if pond hasn't been stocked in 'tooLong' hours
-    var tooLong = 40; // Number of hours before alert shown
+    var tooLong = 40; 
     if (((timeNow - lastStocked) / 3600) > tooLong) {
         document.getElementById('stock-pond-warning').style.display = 'block';
     }
@@ -103,15 +97,10 @@ if (thisPage === 'list') {
         return message;
     }
 
-    // Update Notes box.
-    function updateNote(noteText) {
-        document.getElementById('ctac-note').innerHTML = noteText;
-    }
 
-
-/**
- * The emailer page
- */
+/** --------------------------------------------------------------------------------------------------------
+ * EMAILER PAGE
+** -------------------------------------------------------------------------------------------------------*/
 } else if (thisPage === "emailer") {
 
     // For when the emails are sending ...
@@ -122,9 +111,9 @@ if (thisPage === 'list') {
     });
 
 
-/**
- * The stock page
- */
+/** --------------------------------------------------------------------------------------------------------
+ * STOCK PAGE
+** -------------------------------------------------------------------------------------------------------*/
 } else if (thisPage === 'stock') {
 
     let payments = document.querySelectorAll('.payment-delete');
@@ -132,40 +121,37 @@ if (thisPage === 'list') {
     // If there are no payments, say so.
     if (payments.length == 0) {
         document.getElementById('no-more-payments').style.display = 'block';
-    }
-    // Set a counter
-    let i = 0;
-    // Add an event listener to all payment items.
-    payments.forEach(payment => {
-        payment.addEventListener('click', click => {
-            var xhttp = new XMLHttpRequest();
-            xhttp.onreadystatechange = function() {
-                if (xhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                   if (xhttp.status == 200) {
-                       // The request went through.
-                   }
-                   else if (xhttp.status == 400) {
-                      alert('There was an error 400');
-                   }
-                   else {
-                       alert('something else other than 200 was returned');
-                   }
+    } else {
+        // Set a counter
+        let i = 0;
+        // Add an event listener to all payment items.
+        payments.forEach(payment => {
+            payment.addEventListener('click', click => {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (xhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                        if (xhttp.status == 200) {
+                            // The request went through.
+                        }
+                        else if (xhttp.status == 400) {
+                            alert('There was an error 400');
+                        }
+                        else {
+                            alert('something else other than 200 was returned');
+                        }
+                    }
+                };
+                xhttp.open('GET', url + 'stock/paymentSeen/' + click.target.id);
+                xhttp.send();
+                click.target.parentNode.style.display = 'none';
+                i++;
+                // If the counter equals the number of payments, display the "no more payments" div.
+                if (i == payments.length) {
+                    document.getElementById('no-more-payments').style.display = 'block';
                 }
-            };
-            xhttp.open('GET', url + 'stock/paymentSeen/' + click.target.id);
-            xhttp.send();
-            click.target.parentNode.style.display = 'none';
-
-            // Increment the counter.
-            i++;
-
-            // If the counter equals the number of payments, display the "no more payments" div.
-            if (i == payments.length) {
-                document.getElementById('no-more-payments').style.display = 'block';
-            }
-
+            });
         });
-    });
+    }   
 
     document.getElementById('get-aimsi-instructions').addEventListener('click', function()  {
         document.getElementById('aimsi-instructions').style.display = 'block';
