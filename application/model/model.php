@@ -51,6 +51,9 @@ class Model
         if (!isset($_SESSION["apay"])) {
             $_SESSION["apay"] = "all";
         }
+        if (!isset($_SESSION["ctac_lanid"])) {
+            $_SESSION["ctac_lanid"] = "";
+        }
 
         // If there is $_GET data, set the appropriate session variable.
         if ($_GET) {
