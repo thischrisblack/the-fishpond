@@ -5,7 +5,6 @@
     ↓
     application/config/config.php               
         - Defines constants, like MySQL login info
-        - This is where PEAR mail credentials might go.
         - Also defines URL constant
 
     also ↓
@@ -25,18 +24,7 @@
 
 Maybe rename all the $storeData variables to something without the word store in it?
 
-Find all the commented-out lines for testing and list them below.
-
-/**
-* Issues
-*/
-
-
-
-/**
-* Commented-out for testing (needs to be uncommented)
-*/
-model->singleMailer()
+Make some MySQL database & table starters for fresh installs.
 
 
 
@@ -46,7 +34,7 @@ model->singleMailer()
 
 HEY I think I can make the action-options dropdowns automatically fill in by reading the data.json file. For example, the email dropdown could look for all "email-*" keys in the JSON file, and build them from there.
 
-HEY I think i can do the same thing with the options in the main action dropdown. Add them and their values to the JSON.
+HEY I think I can do the same thing with the options in the main action dropdown. Add them and their values to the JSON.
 
 
 
