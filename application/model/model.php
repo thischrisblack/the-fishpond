@@ -337,7 +337,7 @@ class Model
      */
     public function allAging() {
 
-        $accounts = $this->accountList("all", 0, 180);
+        $accounts = $this->accountList("all", 1, 180);
 
         $one = array_filter($accounts, function($account) {
             return ($account->crnt_extra1 > 0 && $account->crnt_extra1 <11);
