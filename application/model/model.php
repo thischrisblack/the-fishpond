@@ -176,7 +176,7 @@ class Model
     public Function clearNoContact()
     {
 
-        $sql = ("DELETE FROM fishes WHERE (crnt_email = '' AND crnt_hmphone = '')");
+        $sql = ("DELETE FROM fishes WHERE (crnt_email = '' AND crnt_hmphone = '(   )    -')");
         $query = $this->db->prepare($sql);
         $query->execute();
       

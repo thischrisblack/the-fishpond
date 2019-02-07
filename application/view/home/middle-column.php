@@ -13,11 +13,11 @@
         <section class="col-sm-8 account-left">
 
             <div class="account-detail">
-                <h1><?php echo ($accountQuery[0]->crnt_hmphone != '') ? $accountQuery[0]->crnt_hmphone : "NO PHONE"; ?></h1>
+                <h1><?php echo ($accountQuery[0]->crnt_hmphone != "(   )    -") ? $accountQuery[0]->crnt_hmphone : "NO PHONE"; ?></h1>
                 <p>    
                 <h3 id="crnt_name"><?php echo htmlspecialchars($accountQuery[0]->crnt_name)?> </h3>                    
                 <strong><?php echo $accountQuery[0]->crnt_acct . $addItUp->sub;?></strong> <?php echo $addItUp->student;?><br>
-                    <?php echo ($accountQuery[0]->crnt_email != '') ? htmlspecialchars($accountQuery[0]->crnt_email) : "NO EMAIL"; ?>
+                    <?php echo ($accountQuery[0]->crnt_email != "") ? htmlspecialchars($accountQuery[0]->crnt_email) : "NO EMAIL"; ?>
                 </p>
                 
             </div>
