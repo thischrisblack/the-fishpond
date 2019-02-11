@@ -38,6 +38,10 @@ class Home extends Controller
             $min = $minmax[0];
             $max = $minmax[1];
             $accountQuery = $this->model->accountList($session->apay, $min, $max);
+            // If no results, go to done page
+            if (sizeof($accountQuery) < 1) {
+                header('location: ' . URL . 'home/done');
+            }
             // Text for left column header
             $listHeader = ($min) . "-" . ($max) . " (" . count($accountQuery) . ")";
             // $listHeader = count($accountQuery) . " ACCOUNTS";

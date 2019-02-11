@@ -233,32 +233,42 @@ class Model
             return $totalAmtDue;
         }
 
+        // SET SOME DATE VARIABLES
+        $dateToday = DATE('j', time());
+        $dateDue = DATE('j', strtotime($account->crnt_ndate));
+
         // Set the late fee your store charges.
         $lateFee = 10;
 
-        $amountDue = $account->crnt_paymentdue;
-        $daysLate = $account->crnt_extra1;
+        // TRY TO GET THE AMOUNT OF A SINGLE PAYMENT.
+        $numPays = explode(' ', $account->crnt_payments, 2);
+        $num = $numPays[0];
+        // HAS TO BE AT LEAST ONE PAYMENT DUE
+        if($num == 0) { $num = 1; }
+        // GET THE AMOUNT OF A SINGLE PAYMENT. SUCH A HASSLE
+        $onePayment = $account->crnt_paymentdue / $num;  
 
-        // How many late fees are due?
+        // IF THE DUE DATE (AS IN DAY OF THE MONTH) IS GREATER THAN TODAY
+        if ($dateDue > $dateToday) {
+                // THEN AIMSI HAS OVERSHOT THE TRUE PAYMENT DUE BY ONE PAYMENT
+                // SO WE NEED TO SUBTRACT THAT
+                $amountDue = $account->crnt_paymentdue - $onePayment;
+        } else {
+                // OTHERWISE THE AMT DUE IS THE PAYMENT DUE
+                $amountDue = $account->crnt_paymentdue;
+        }
+
+        // SO FAR SO GOOD. LET'S GET THE DAYS LATE, MULTIPLIED BY ONE TO CONVERT TO INT
+        $daysLate = $account->crnt_extra1 * 1;
+
+        // DETERMINE HOW MANY LATE FEES DUE
         $numberLateFees = 0;
         if ($daysLate > 10) {
             $numberLateFees = floor(($daysLate - 10) / 30) + 1;
         }
 
+        // GET LATE FEE 
         $totalLateFee = $numberLateFees * $lateFee;
-
-        // AIMsi has "assesed" late fees in the export. Here we deal with that.
-        if (($account->crnt_latedue - $lateFee) > 0) {
-            if ($daysLate > 0 AND $daysLate < 11) {
-                $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-            } else if ($daysLate > 30 AND $daysLate < 41) {
-                $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-            } else if ($daysLate > 60 AND $daysLate < 71) {
-                $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-            } else {
-                $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee);
-            }
-        }
 
         $totalAmtDue = $amountDue + $totalLateFee;
 
@@ -322,12 +332,8 @@ class Model
         
         $result = $query->fetchAll();
 
-        if (sizeof($result) > 0) {
-            return $result;
-        } else {
-            // If no results, show the "done" page.
-            header('location: ' . URL . 'home/done');
-        }
+        return $result;
+
     }
 
     /**
@@ -355,7 +361,7 @@ class Model
             return ($account->crnt_extra1 > 90 && $account->crnt_extra1 <121);
         });
         $oneTwentyPlus = array_filter($accounts, function($account) {
-            return $account->crnt_extra1 > 120;
+            return ($account->crnt_extra1 > 120 && $account->crnt_extra1 <181);
         });
 
         $aging = new stdClass();

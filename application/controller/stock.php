@@ -70,6 +70,9 @@ class Stock extends Controller
             // Calculate days late and add it to the database in the extra1 field
             $this->model->daysLate($accounts);
 
+            // Get the updated acccount list object for the final function
+            $accounts = $this->model->accountList("all", -1, 1000);
+
             // Update the paymentdue field with correctly calculated amount
             $this->model->dueCalc($accounts);
 

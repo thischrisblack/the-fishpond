@@ -3,7 +3,7 @@
     <?php
 
     // If there are no more accounts in any aging category.
-    if (count($aging) == "0") { ?>
+    if ($aging->all == 0) { ?>
 
         <br>
 
