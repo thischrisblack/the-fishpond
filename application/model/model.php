@@ -220,103 +220,44 @@ class Model
     */
     public function dueCalculator($account) {
 
-        // First, let's do the easy one, if the payment due equals the total payoff.
-        if($account->crnt_amtdue == $account->crnt_payoff) {
-            $totalAmtDue = $account->crnt_payoff;
-            return $totalAmtDue;
-        }
+    /**
+     * This function calculates the balance due for each account, which is a value
+     * not availble in the AIMsi exported data. We must work through a number of conditions
+     * and do a little math to get the proper amount. There is one edge case where this 
+     * formula fails, and that is when the customer has made a *partial* payment previously. 
+     * There is nothing in the data export from AIMsi to indicate when this condition applies,
+     * so right now I can't find a way around this. For our customers, however, it is rare.
+     */
 
-        // Get numeric dates of today and due date
-        $dateToday = DATE('j', time());
-        $dateDue = DATE('j', strtotime($account->crnt_ndate));
-
-        // Get the number of payments due
-        $numPays = explode(' ', $account->crnt_payments, 2);
-        $num = $numPays[0];
-
-        // If the numeric date due is equal to or less than today's numeric date
-        if ($dateDue <= $dateToday) {
-            // Add the two fields for total due.
-            $totalAmtDue = $account->crnt_paymentdue + $account->crnt_latedue;
-        } else {
-            // Add the two fields and subtract one payment, which is crnt_paymentdue / number of payments
-            $totalAmtDue = $account->crnt_paymentdue + $account->crnt_latedue - ($account->crnt_paymentdue / $num);
-        }
-
+    // First, let's do the easy one, if the payment due equals the total payoff.
+    if($account->crnt_amtdue == $account->crnt_payoff) {
+        $totalAmtDue = $account->crnt_payoff;
         return $totalAmtDue;
+    }
 
-        // All the commented-out section below is the original dueCalculator, but I believe I've found a better way. Leaving it here for testing.
+    // Get numeric dates of today and due date
+    $dateToday = DATE('j', time());
+    $dateDue = DATE('j', strtotime($account->crnt_ndate));
 
-    //     /**
-    //      * This whole situation is frustrating. AIMsi won't give a simple
-    //      * amount due in any data export, and certainly not in the statements
-    //      * export we use for this, so we have to calculate it here. It's not
-    //      * 100% fool-proof, but it works most of the time.
-    //      */
+    // Get the number of payments due
+    $numPays = explode(' ', $account->crnt_payments, 2);
+    $num = $numPays[0];
 
-    //     // SET SOME DATE VARIABLES
-    //     // Not needed?
-    //     // $today = strtotime('00:00:00');
-    //     $dateToday = DATE('j', time());
-    //     $dateDue = DATE('j', strtotime($account->crnt_ndate));
+    // The basic total due is the sum of these two columns
+    $totalAmtDue = $account->crnt_paymentdue + $account->crnt_latedue;
 
-    //     // SET THE LATE FEE
-    //     $lateFee = 10;
+    // A single payment is the crnt_paymentdue value divided by the number of payments due.
+    // NOTE: If the account has a partial payment in the mix, this will give a wrong answer.
+    $onePayment = $account->crnt_paymentdue / $num;
 
-    //     // TRY TO GET THE AMOUNT OF A SINGLE PAYMENT.
-    //     $numPays = explode(' ', $account->crnt_payments, 2);
-    //     $num = $numPays[0];
-    //     // HAS TO BE AT LEAST ONE PAYMENT DUE
-    //     if($num == 0) { $num = 1; }
-    //     // GET THE AMOUNT OF A SINGLE PAYMENT. SUCH A HASSLE
-    //     $onePayment = $account->crnt_paymentdue / $num;  
+    // Conditional further total due calculation
+    if ($dateDue > $dateToday) {            
+        $totalAmtDue = $totalAmtDue - $onePayment; // Subtract one payment.
+    } else if ($dateToday - $dateDue > 10) {
+        $totalAmtDue += 10; // Add the $10 late fee
+    }
 
-    //     // IF THE DUE DATE (AS IN DAY OF THE MONTH) IS GREATER THAN TODAY
-    //     // NOTE: This may not be needed anymore because I have since added the 
-    //     // clearCurrent() method above.
-    //     if ($dateDue > $dateToday) {
-    //          // THEN AIMSI HAS OVERSHOT THE TRUE PAYMENT DUE BY ONE PAYMENT
-    //          // SO WE NEED TO SUBTRACT THAT
-    //          $amountDue = $account->crnt_paymentdue - $onePayment;
-    //     } else {
-    //          // OTHERWISE THE AMT DUE IS THE PAYMENT DUE
-    //          $amountDue = $account->crnt_paymentdue;
-    //     }
-    //     //$amountDue = $account->crnt_paymentdue;
-
-    //     // SO FAR SO GOOD. LET'S GET THE DAYS LATE
-    //     $daysLate = $account->crnt_extra1 * 1;
-
-    //     // DETERMINE HOW MANY LATE FEES DUE
-    //     $numberLateFees = 0;
-    //     if ($daysLate > 10) {
-    //         $numberLateFees = floor(($daysLate - 10) / 30) + 1;
-    //     }
-
-    //     // GET LATE FEE 
-    //     $totalLateFee = $numberLateFees * $lateFee;
-
-    //     // THIS WHOLE CONVOLUTED THING TRIES TO ACCOUNT FOR THE "ASSESSED" FEES
-    //    if (($account->crnt_latedue - $lateFee) > 0) {
-    //        if ($daysLate > 0 AND $daysLate < 11) {
-    //            $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-    //        } else if ($daysLate > 30 AND $daysLate < 41) {
-    //            $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-    //        } else if ($daysLate > 60 AND $daysLate < 71) {
-    //            $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee - $lateFee);
-    //        } else {
-    //            $totalLateFee = $totalLateFee + ($account->crnt_latedue - $totalLateFee);
-    //        }
-    //    }
-
-    //     $totalAmtDue = $amountDue + $totalLateFee;
-
-    //     // We don't want the amount due to be greater than the remaining payoff balance on the account.
-    //     if($account->crnt_amtdue == $account->crnt_payoff) {
-    //         $totalAmtDue = $account->crnt_payoff;
-    //     }
-
-    //     return $totalAmtDue;
+    return $totalAmtDue;
 
     }
 
