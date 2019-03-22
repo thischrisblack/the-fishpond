@@ -56,7 +56,7 @@ define('DB_TYPE', 'mysql');
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'fishpond');
 define('DB_USER', 'root');
-define('DB_PASS', 'mysql');
+define('DB_PASS', '');
 define('DB_CHARSET', 'utf8');
 
 /**
