@@ -6,7 +6,7 @@ This was built upon panique's [MINI, an extremely simple barebone PHP applicatio
 
 Your store staff uses the Fishpond when making collection calls on delinquent rental accounts. This app takes data exported from AIMsi's Reports/Catalog/Contracts/Contract Statements report and presents it in manageable lists, sortable by aging category and autopay status. 
 
-Each account in turn appears in the main area with action dropdowns indicating that the customer was called, emailed, left a message, etc. Each account's contact history is also diplayed. Once the customer is contacted and the result noted, the list advances to the next account.
+Each account in turn appears in the main area with action dropdowns indicating that the customer was called, emailed, left a message, etc. Each account's contact history is also displayed. Once the customer is contacted and the result noted, the list advances to the next account.
 
 This app has no documentation right now! That's to do.
 
