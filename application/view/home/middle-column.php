@@ -16,7 +16,7 @@
                 <h1><?php echo ($accountQuery[0]->crnt_hmphone != "(   )    -") ? $accountQuery[0]->crnt_hmphone : "NO PHONE"; ?></h1>
                 <p>    
                 <h3 id="crnt_name"><?php echo htmlspecialchars($accountQuery[0]->crnt_name)?> </h3>                    
-                <strong><?php echo $accountQuery[0]->crnt_acct . $addItUp->sub;?></strong> <?php echo $addItUp->student;?><br>
+                    <strong><?php echo $accountQuery[0]->crnt_acct . $addItUp->sub;?></strong> <?php echo $addItUp->student;?><br>
                     <?php echo ($accountQuery[0]->crnt_email != "") ? htmlspecialchars($accountQuery[0]->crnt_email) : "NO EMAIL"; ?>
                 </p>
                 
@@ -38,7 +38,8 @@
                             <!-- Employee, date --> 
                             <div class="sticky-note-info">
                                 <?php echo date("m-d-y", $sticky->sticky_date) . " | " . 
-                                            htmlspecialchars($sticky->sticky_lanid, ENT_QUOTES, 'UTF-8'); ?>
+                                           htmlspecialchars($sticky->sticky_lanid, 
+                                           ENT_QUOTES, 'UTF-8'); ?>
                             </div>
                         </div>
             <?php   }

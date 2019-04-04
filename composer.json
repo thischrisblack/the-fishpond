@@ -8,16 +8,12 @@
     "authors": [
         {
             "name": "Chris Black",
-            "role": "Cloned Panique's 'mini' and turned it into this."
-        },
-        {
-            "name": "Panique",
-            "role": "Developer"
+            "role": "Developer."
         }
     ],
     "support": {
-        "issues": "https://github.com/thischrisblack/fishpond/issues",
-        "source": "https://github.com/thischrisblack/fishpond"
+        "issues": "https://github.com/thischrisblack/the-fishpond/issues",
+        "source": "https://github.com/thischrisblack/the-fishpond"
     },
     "require": {
         "php": ">=5.3.0",

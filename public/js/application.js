@@ -19,6 +19,7 @@ if (thisPage === 'list') {
         // Set event handler on action option dropdown
         let contactNoteBox = document.getElementById('ctac_note');
         let actionOptions = document.querySelectorAll('.action-options');
+        
         // Add an event listener to all action options lists.
         actionOptions.forEach(action => {
             action.addEventListener("change", list => {

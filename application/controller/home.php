@@ -30,7 +30,7 @@ class Home extends Controller
         if (isset($_GET["lookup"])) {
             // If it's a search, run account query on the lookup value (account#, phone#, email)
             $accountQuery = $this->model->displayAccount($_GET["lookup"]);
-            // Text for left column header in it's a lookup rather than the full list.
+            // Text for left column header if it's a lookup rather than the full list.
             $listHeader = "Account:";
         } else {
             // If no search, get the full account list
