@@ -1,6 +1,6 @@
 # THE FISHPOND
 
-This is a contact-management app for retail stores who use the AIMsi P.O.S. system AND do their own collections on delinquent rental accounts. If that's you, this is your lucky day! (Except that this repo has no documentation on how to, you know, install and run it. I hope to fill in that gap on a later date. In the mean time, feel free to contact me if you need help!)
+This is a contact-management app for retail stores who use the AIMsi P.O.S. system AND do their own collections on delinquent rental accounts. If that's you, this is your lucky day! (This app has no documentation at this time. If you'd like to implement it for your store, feel free to contact me if you need help!)
 
 This was built upon panique's [MINI, an extremely simple barebone PHP application](http://www.dev-metal.com/mini-extremely-simple-barebone-php-application/).
 
