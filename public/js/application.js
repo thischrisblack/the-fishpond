@@ -50,7 +50,7 @@ if (thisPage === 'list') {
 
 
     // Set event handler on action dropdown, displays additional action options.
-    document.getElementById('ctac_action').onchange = function () {
+    document.getElementById('ctac_action').onchange = function() {
         // Clear out text box
         document.getElementById('ctac_note').innerHTML = '';
         // Get the selected action value
