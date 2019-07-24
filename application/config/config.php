@@ -84,6 +84,7 @@ define('BUS_APAY', 'Y');
  * PHPMailer info
  */
 define('EMAIL_ADDRESS', 'youremailaddress@youremailprovider.com');
+define('EMAIL_REPLY_TO', 'yourReplyToAddress@youremailprovider.com');
 define('EMAIL_NAME', 'Your Name');
 define('EMAIL_PASSWORD', 'Your Password');
 define('EMAIL_SUBJECT', 'Your Default Subject');

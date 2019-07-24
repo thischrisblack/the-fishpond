@@ -3,7 +3,7 @@
 /**
  * PHPMailer.
  */
-use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\PHPMailer;
 
 class Model
 {
@@ -279,44 +279,44 @@ class Model
     */
     public function dueCalculator($account) {
 
-    /**
-     * This function calculates the balance due for each account, which is a value
-     * not availble in the AIMsi exported data. We must work through a number of conditions
-     * and do a little math to get the proper amount. There is one edge case where this 
-     * formula fails, and that is when the customer has made a *partial* payment previously. 
-     * There is nothing in the data export from AIMsi to indicate when this condition applies,
-     * so right now I can't find a way around this. For our customers, however, it is rare.
-     */
+      /**
+       * This function calculates the balance due for each account, which is a value
+       * not availble in the AIMsi exported data. We must work through a number of conditions
+       * and do a little math to get the proper amount. There is one edge case where this 
+       * formula fails, and that is when the customer has made a *partial* payment previously. 
+       * There is nothing in the data export from AIMsi to indicate when this condition applies,
+       * so right now I can't find a way around this. For our customers, however, it is rare.
+       */
 
-    // First, let's do the easy one, if the payment due equals the total payoff.
-    if($account->crnt_amtdue == $account->crnt_payoff) {
-        $totalAmtDue = $account->crnt_payoff;
-        return $totalAmtDue;
-    }
+      // First, let's do the easy one, if the payment due equals the total payoff.
+      if($account->crnt_amtdue == $account->crnt_payoff) {
+          $totalAmtDue = $account->crnt_payoff;
+          return $totalAmtDue;
+      }
 
-    // Get numeric dates of today and due date
-    $dateToday = DATE('j', time());
-    $dateDue = DATE('j', strtotime($account->crnt_ndate));
+      // Get numeric dates of today and due date
+      $dateToday = DATE('j', time());
+      $dateDue = DATE('j', strtotime($account->crnt_ndate));
 
-    // Get the number of payments due
-    $numPays = explode(' ', $account->crnt_payments, 2);
-    $num = $numPays[0];
+      // Get the number of payments due
+      $numPays = explode(' ', $account->crnt_payments, 2);
+      $num = $numPays[0];
 
-    // The basic total due is the sum of these two columns
-    $totalAmtDue = $account->crnt_paymentdue + $account->crnt_latedue;
+      // The basic total due is the sum of these two columns
+      $totalAmtDue = $account->crnt_paymentdue + $account->crnt_latedue;
 
-    // A single payment is the crnt_paymentdue value divided by the number of payments due.
-    // NOTE: If the account has a partial payment in the mix, this will give a wrong answer.
-    $onePayment = $account->crnt_paymentdue / $num;
+      // A single payment is the crnt_paymentdue value divided by the number of payments due.
+      // NOTE: If the account has a partial payment in the mix, this will give a wrong answer.
+      $onePayment = $account->crnt_paymentdue / $num;
 
-    // Conditional further total due calculation
-    if ($dateDue > $dateToday) {            
-        $totalAmtDue = $totalAmtDue - $onePayment; // Subtract one payment.
-    } else if ($dateToday - $dateDue > 10) {
-        $totalAmtDue += 10; // Add the $10 late fee
-    }
+      // Conditional further total due calculation
+      if ($dateDue > $dateToday) {            
+          $totalAmtDue = $totalAmtDue - $onePayment; // Subtract one payment.
+      } else if ($dateToday - $dateDue > 10) {
+          $totalAmtDue += 10; // Add the $10 late fee
+      }
 
-    return $totalAmtDue;
+      return $totalAmtDue;
 
     }
 
@@ -649,65 +649,82 @@ class Model
     /** --------------------------------------------------------------------------------------------------------
      * FUNCTIONS FOR EMAILING AND MASS MAILING
     * --------------------------------------------------------------------------------------------------------*/  
-
     /**
      * Single mailer
      * This configuration of PHPMailer assumes you're using a Gmail account.
      * You'll have to change this to settings for your own email situation.
      */
-    public function singleMailer($custEmail, $custName, $custMessage, $custSubject = EMAIL_SUBJECT) {
+    public function singleMailer($custAcct, $custEmail, $custName, $custMessage, $custSubject = EMAIL_SUBJECT) {
 
-        //Add line breaks for HTML message
-        $htmlMessage = nl2br($custMessage);
-    
-        //Create a new PHPMailer instance
-        $mail = new PHPMailer;
-        //Tell PHPMailer to use SMTP
-        $mail->isSMTP();
-        //Enable SMTP debugging
-        // 0 = off (for production use)
-        // 1 = client messages
-        // 2 = client and server messages
-        $mail->SMTPDebug = 0;
-        //Set the hostname of the mail server
-        $mail->Host = 'smtp.gmail.com';
-        // use
-        // $mail->Host = gethostbyname('smtp.gmail.com');
-        // if your network does not support SMTP over IPv6
-        //Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
-        $mail->Port = 587;
-        //Set the encryption system to use - ssl (deprecated) or tls
-        $mail->SMTPSecure = 'tls';
-        //Whether to use SMTP authentication
-        $mail->SMTPAuth = true;
-        //Username to use for SMTP authentication - use full email address for gmail
-        $mail->Username = EMAIL_ADDRESS;
-        //Password to use for SMTP authentication
-        $mail->Password = EMAIL_PASSWORD;
-        //Set who the message is to be sent from
-        $mail->setFrom(EMAIL_ADDRESS, EMAIL_NAME);
-        //Set an alternative reply-to address
-        $mail->addReplyTo(EMAIL_ADDRESS, EMAIL_NAME);
-        //Set who the message is to be sent to
-        $mail->addAddress($custEmail, $custName);
-        //Set the subject line
-        $mail->Subject = $custSubject;
-        //Read an HTML message body from an external file, convert referenced images to embedded,
-        //convert HTML into a basic plain-text alternative body
-        $mail->msgHTML($htmlMessage);
-        //Replace the plain text body with one created manually
-        $mail->AltBody = $custMessage;
+      //Add account number to subject so Gmail will thread converstaions separately
+      $custSubject = $custSubject . " - " . $custAcct;
 
-        
-        /**
-         * Actual sending of mail commented out for testing!
-         */
-         
-        // if (!$mail->send()) {
-        //     echo "Mailer Error: " . $mail->ErrorInfo;
-        // } else {
-        //     echo "Message sent!";
-        // }
+      $to = $custEmail;
+      $subject = $custSubject;
+      $message = $custMessage;
+      $headers = "From: " . EMAIL_NAME . " <" . EMAIL_ADDRESS . ">\r\n" . 
+                  "Reply-To: " . EMAIL_REPLY_TO . "\r\n" .
+                  'X-Mailer: PHP/' . phpversion();
+
+      $sendThatMail = mail($to, $subject, $message, $headers);
+
+      if (!$sendThatMail) {
+          $errorMessage = error_get_last()['message'];
+          echo $errorMessage;
+      }
+
+      // NOT USED SINCE PHPMAILER STOPPED WORKING!
+      // //Create a new PHPMailer instance
+      // $mail = new PHPMailer;
+      // //Tell PHPMailer to use SMTP
+      // $mail->isSMTP();
+      // //Enable SMTP debugging
+      // // 0 = off (for production use)
+      // // 1 = client messages
+      // // 2 = client and server messages
+      // $mail->SMTPDebug = 2;
+      // //Set the hostname of the mail server
+      // // $mail->Host = 'mail.chicagomusicstore.com';
+
+      // $mail->Host = 'localhost';
+      // // use
+      // // $mail->Host = gethostbyname('smtp.gmail.com');
+      // // if your network does not support SMTP over IPv6
+      // //Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
+      // $mail->Port = 25;
+
+      // //Set the encryption system to use - ssl (deprecated) or tls
+      // $mail->SMTPSecure = false;
+      // //Whether to use SMTP authentication
+      // $mail->SMTPAuth = false;
+
+      // //Username to use for SMTP authentication - use full email address for gmail
+      // // $mail->Username = EMAIL_ADDRESS;
+
+      // //Password to use for SMTP authentication
+      // // $mail->Password = EMAIL_PASSWORD;
+      // //Set who the message is to be sent from
+      // $mail->setFrom(EMAIL_ADDRESS, EMAIL_NAME);
+      // //Set an alternative reply-to address
+      // $mail->addReplyTo('chicagostore.ar@gmail.com', EMAIL_NAME);
+      // //Set who the message is to be sent to
+      // $mail->addAddress($custEmail, $custName);
+      // //Add Chris to BCC
+      // // $mail->addBCC('musiclandtucson@gmail.com', 'Chris');
+      // //Set the subject line
+      // $mail->Subject = $custSubject;
+      // //Read an HTML message body from an external file, convert referenced images to embedded,
+      // //convert HTML into a basic plain-text alternative body
+      // $mail->msgHTML($htmlMessage);
+      // //Replace the plain text body with one created manually
+      // $mail->AltBody = $custMessage;
+
+      // //send the message, check for errors
+      // if (!$mail->send()) {
+      //     echo "Mailer Error: " . $mail->ErrorInfo;
+      // } else {
+      //     echo "Message sent!";
+      // }
     }
 
     /**
@@ -728,7 +745,7 @@ class Model
                     $personalized = $this->personalizer($elements->body, $account);
 
                     // Send to emailer
-                    $this->singleMailer($account->crnt_email, $account->crnt_name, $personalized, $elements->subject);
+                    $this->singleMailer($account->crnt_acct, $account->crnt_email, $account->crnt_name, $personalized, $elements->subject);
 
                     // Get the account off the list.
                     $this->delistAccount($account->crnt_acct, "Y");

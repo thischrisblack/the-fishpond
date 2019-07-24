@@ -44,7 +44,7 @@ class Stock extends Controller
     {
 
         // Increase the time limit, just in case
-        set_time_limit(150);
+        set_time_limit(300);
 
         // if we have POST data to stock the pond.
         if (isset($_POST["stock_the_pond"])) {
