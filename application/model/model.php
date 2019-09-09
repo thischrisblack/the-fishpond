@@ -1,10 +1,5 @@
 <?php
 
-/**
- * PHPMailer.
- */
-// use PHPMailer\PHPMailer\PHPMailer;
-
 class Model
 {
   /**
@@ -22,9 +17,9 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * GENERAL FUNCTIONS
-   ** -------------------------------------------------------------------------------------------------------*/
+   ** ------------------------------------------------------------------------*/
 
   /**
    * Sets session variables for list filters like aging categories and autopays.
@@ -82,10 +77,10 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * POND STOCKING FUNCTIONS
    * This is a LONG series of functions getting the data into the database.
-   * --------------------------------------------------------------------------------------------------------*/
+   * -------------------------------------------------------------------------*/
 
   /**
    * Load account data into database
@@ -325,9 +320,9 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * FUNCTIONS FOR HANDLING ONLINE PAYMENTS (if your store does that)
-   * --------------------------------------------------------------------------------------------------------*/
+   * -------------------------------------------------------------------------*/
 
   /**
    * Get online payments
@@ -359,9 +354,9 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * FUNCTIONS TO GET ACCOUNT LISTS AND HISTORY
-   * --------------------------------------------------------------------------------------------------------*/
+   * -------------------------------------------------------------------------*/
 
   /**
    * Get account list
@@ -546,9 +541,9 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * FUNCTIONS TO POST NEW CONTACT NOTES
-   * --------------------------------------------------------------------------------------------------------*/
+   * -------------------------------------------------------------------------*/
 
   /**
    * Post a Sticky Note
@@ -573,9 +568,6 @@ class Model
 
     );
 
-    // useful for debugging: you can see the SQL behind above construction by using:
-    // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
     $query->execute($parameters);
   }
 
@@ -587,9 +579,6 @@ class Model
     $sql = "DELETE FROM sticky WHERE sticky_ID = :id";
     $query = $this->db->prepare($sql);
     $parameters = array(':id' => $id);
-
-    // useful for debugging: you can see the SQL behind above construction by using:
-    // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
 
     $query->execute($parameters);
   }
@@ -622,9 +611,6 @@ class Model
       ':ctac_daysLate' => $data['ctac_daysLate'],
     );
 
-    // useful for debugging: you can see the SQL behind above construction by using:
-    // echo '[ PDO DEBUG ]: ' . Helper::debugPDO($sql, $parameters);  exit();
-
     $query->execute($parameters);
   }
 
@@ -648,9 +634,9 @@ class Model
 
 
 
-  /** --------------------------------------------------------------------------------------------------------
+  /** -------------------------------------------------------------------------
    * FUNCTIONS FOR EMAILING AND MASS MAILING
-   * --------------------------------------------------------------------------------------------------------*/
+   * -------------------------------------------------------------------------*/
   /**
    * Single mailer
    * This configuration of PHPMailer assumes you're using a Gmail account.
@@ -675,59 +661,6 @@ class Model
       $errorMessage = error_get_last()['message'];
       echo $errorMessage;
     }
-
-    // NOT USED SINCE PHPMAILER STOPPED WORKING!
-    // //Create a new PHPMailer instance
-    // $mail = new PHPMailer;
-    // //Tell PHPMailer to use SMTP
-    // $mail->isSMTP();
-    // //Enable SMTP debugging
-    // // 0 = off (for production use)
-    // // 1 = client messages
-    // // 2 = client and server messages
-    // $mail->SMTPDebug = 2;
-    // //Set the hostname of the mail server
-    // // $mail->Host = 'mail.chicagomusicstore.com';
-
-    // $mail->Host = 'localhost';
-    // // use
-    // // $mail->Host = gethostbyname('smtp.gmail.com');
-    // // if your network does not support SMTP over IPv6
-    // //Set the SMTP port number - 587 for authenticated TLS, a.k.a. RFC4409 SMTP submission
-    // $mail->Port = 25;
-
-    // //Set the encryption system to use - ssl (deprecated) or tls
-    // $mail->SMTPSecure = false;
-    // //Whether to use SMTP authentication
-    // $mail->SMTPAuth = false;
-
-    // //Username to use for SMTP authentication - use full email address for gmail
-    // // $mail->Username = EMAIL_ADDRESS;
-
-    // //Password to use for SMTP authentication
-    // // $mail->Password = EMAIL_PASSWORD;
-    // //Set who the message is to be sent from
-    // $mail->setFrom(EMAIL_ADDRESS, EMAIL_NAME);
-    // //Set an alternative reply-to address
-    // $mail->addReplyTo('chicagostore.ar@gmail.com', EMAIL_NAME);
-    // //Set who the message is to be sent to
-    // $mail->addAddress($custEmail, $custName);
-    // //Add Chris to BCC
-    // // $mail->addBCC('musiclandtucson@gmail.com', 'Chris');
-    // //Set the subject line
-    // $mail->Subject = $custSubject;
-    // //Read an HTML message body from an external file, convert referenced images to embedded,
-    // //convert HTML into a basic plain-text alternative body
-    // $mail->msgHTML($htmlMessage);
-    // //Replace the plain text body with one created manually
-    // $mail->AltBody = $custMessage;
-
-    // //send the message, check for errors
-    // if (!$mail->send()) {
-    //     echo "Mailer Error: " . $mail->ErrorInfo;
-    // } else {
-    //     echo "Message sent!";
-    // }
   }
 
   /**
